@@ -18,12 +18,24 @@ public class Goban extends Canvas implements Runnable {
 	 */
 	private boolean paused;
 
+	private Demo demo;
+
 	public Goban() {
 		stopped = false;
 		paused = false;
+		try {
+			demo = new Cube(this);
+		} catch (Exception e) {
+			stopped = true;
+		}
 	}
 
 	public void paint(Graphics g) {
+		if (demo != null) {
+			demo.paint(g);
+			return;
+		}
+
 		//Set color to white
 		g.setColor( 0x0FFFFFF );
 		//Fill entire screen
