@@ -5,8 +5,12 @@ import java.io.IOException;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 import java.lang.System;
+import javax.microedition.lcdui.Command;
 
 public class Goban extends Canvas implements Runnable {
+
+	public Command exitCmd = new Command("Exit", Command.SCREEN, 1);
+	public Command skipDemoCmd = new Command("Skip", Command.SCREEN, 1);
 
 	/**
 	 * Is game thread in state of being stopped.
@@ -23,6 +27,9 @@ public class Goban extends Canvas implements Runnable {
 	public Goban() {
 		stopped = false;
 		paused = false;
+
+		addCommand(skipDemoCmd);
+
 		try {
 			demo = new Cube(this);
 		} catch (Exception e) {
@@ -31,8 +38,12 @@ public class Goban extends Canvas implements Runnable {
 	}
 
 	public void paint(Graphics g) {
+		long time = System.currentTimeMillis();
 		if (demo != null) {
-			demo.paint(g);
+			demo.paint(g, time);
+			if (demo.done()) {
+				skipDemo();
+			}
 			return;
 		}
 
@@ -43,7 +54,7 @@ public class Goban extends Canvas implements Runnable {
 		//Set color to black
 		g.setColor( 0 );
 
-		g.drawString(Long.toString(System.currentTimeMillis()), 0, 0,
+		g.drawString(Long.toString(time), 0, 0,
 			Graphics.TOP | Graphics.LEFT );
 	}
 
@@ -57,6 +68,12 @@ public class Goban extends Canvas implements Runnable {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {}
 		}
+	}
+
+	public void skipDemo() {
+		removeCommand(skipDemoCmd);
+		addCommand(exitCmd);
+		demo = null;
 	}
 
 	public void stop() {

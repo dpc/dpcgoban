@@ -25,8 +25,6 @@ import javax.microedition.lcdui.CommandListener;
  */
 public class GameMain extends MIDlet implements CommandListener {
 
-	private Command exitCmd = new Command("Exit", Command.SCREEN, 1);
-
 
 	private Display display;
 	private Goban goban;
@@ -39,9 +37,6 @@ public class GameMain extends MIDlet implements CommandListener {
 	public GameMain() {
 		goban = new Goban();
 
-
-
-		goban.addCommand(exitCmd);
 		goban.setCommandListener(this);
 	}
 
@@ -56,32 +51,21 @@ public class GameMain extends MIDlet implements CommandListener {
 	 * Pause application.
 	 */
 	protected void pauseApp() {
-		//goban.mute();
-		//stop game's timing thread
-
 		try {
-			//we will start another thread after this one finishes
 			goban.stop();
 			thread.join();
-		} catch (InterruptedException ie) {
-			//
-		}
+		} catch (InterruptedException ie) {}
 	}
 
 	/**
 	 * Start application.
 	 */
 	protected void startApp() {
-		//theGame.unMute();
-
 		display = Display.getDisplay(this);
 		display.setCurrent(goban);
 
 		try {
-			// Start the game in its own thread
 			thread = new Thread(goban);
-			//ensure the game thread will work after pause
-			//goban.setDestroyed(false);
 			thread.start();
 		} catch (Error e) {
 			destroyApp(false);
@@ -90,12 +74,14 @@ public class GameMain extends MIDlet implements CommandListener {
 	}
 
 	/**
-	 * Handle user commands.
+	 * Handle user menu commands.
 	 */
 	public void commandAction(Command c, Displayable d) {
-		if (c == exitCmd) {
+		if (c == goban.exitCmd) {
 			destroyApp(false);
 			notifyDestroyed();
+		} else if (c == goban.skipDemoCmd) {
+			goban.skipDemo();
 		}
 	}
 }

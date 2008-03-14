@@ -12,8 +12,11 @@ public class RotatingStones implements Demo {
  
 	private Group transRotGroup;
 	private World _world;
-	private int appTime = 0;
 	private Camera camera;
+
+	public boolean done() {
+		return false;
+	}
 
 	public RotatingStones(Canvas c) {
 		model = new Model();
@@ -165,10 +168,9 @@ public class RotatingStones implements Demo {
 		transRotGroup.addAnimationTrack(transTrack);
 	}
 
-	public void paint(Graphics graphics) {
-		appTime++;
-		camera.setTranslation(0.0f, (float)(Math.cos(appTime/10.0f)*10.0f), (float)(Math.sin(appTime/10.0f)*10.0f));
-		_world.animate(appTime);
+	public void paint(Graphics graphics, long time) {
+		camera.setTranslation(0.0f, (float)(Math.cos(time/10.0f)*10.0f), (float)(Math.sin(time/10.0f)*10.0f));
+		_world.animate((int)time);
 		_graphics3d.bindTarget(graphics);
 		_graphics3d.render(_world);
 		_graphics3d.releaseTarget();
