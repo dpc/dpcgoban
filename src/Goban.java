@@ -7,10 +7,16 @@ import javax.microedition.lcdui.Graphics;
 import java.lang.System;
 import javax.microedition.lcdui.Command;
 
+/**
+ * Game board, timers and everything used to play go.
+ *
+ * This is main controlling class. It has its own thread
+ * to control game, networking etc.
+ */
 public class Goban extends Canvas implements Runnable {
 
 	public Command exitCmd = new Command("Exit", Command.SCREEN, 1);
-	public Command skipDemoCmd = new Command("Skip", Command.SCREEN, 1);
+	public Command skipIntroCmd = new Command("Skip", Command.SCREEN, 1);
 
 	/**
 	 * Is game thread in state of being stopped.
@@ -22,27 +28,39 @@ public class Goban extends Canvas implements Runnable {
 	 */
 	private boolean paused;
 
-	private Demo demo;
+	/**
+	 * Intro.
+	 *
+	 * Nil if none.
+	 */
+	private Intro demo;
 
+	/**
+	 * Ctor.
+	 */
 	public Goban() {
 		stopped = false;
 		paused = false;
 
-		addCommand(skipDemoCmd);
+		addCommand(skipIntroCmd);
 
 		try {
 			demo = new Cube(this);
 		} catch (Exception e) {
+			/* fails on problems with textures etc. */
 			stopped = true;
 		}
 	}
 
+	/**
+	 * Main paint() function for this midlet.
+	 */
 	public void paint(Graphics g) {
 		long time = System.currentTimeMillis();
 		if (demo != null) {
 			demo.paint(g, time);
 			if (demo.done()) {
-				skipDemo();
+				skipIntro();
 			}
 			return;
 		}
@@ -58,6 +76,9 @@ public class Goban extends Canvas implements Runnable {
 			Graphics.TOP | Graphics.LEFT );
 	}
 
+	/**
+	 * Thread runs here.
+	 */
 	public void run() {
 		while (!stopped) {
 			if (!paused) {
@@ -70,12 +91,18 @@ public class Goban extends Canvas implements Runnable {
 		}
 	}
 
-	public void skipDemo() {
-		removeCommand(skipDemoCmd);
+	/**
+	 * Skip intro mode.
+	 */
+	public void skipIntro() {
+		removeCommand(skipIntroCmd);
 		addCommand(exitCmd);
 		demo = null;
 	}
 
+	/**
+	 * Stop game.
+	 */
 	public void stop() {
 		stopped = true;
 	}

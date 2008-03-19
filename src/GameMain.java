@@ -80,8 +80,8 @@ public class GameMain extends MIDlet implements CommandListener {
 		if (c == goban.exitCmd) {
 			destroyApp(false);
 			notifyDestroyed();
-		} else if (c == goban.skipDemoCmd) {
-			goban.skipDemo();
+		} else if (c == goban.skipIntroCmd) {
+			goban.skipIntro();
 		}
 	}
 }
