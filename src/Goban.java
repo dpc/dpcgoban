@@ -15,8 +15,30 @@ import javax.microedition.lcdui.Command;
  */
 public class Goban extends Canvas implements Runnable {
 
+	/**
+	 * Command event when application close was requested.
+	 */
 	public Command exitCmd = new Command("Exit", Command.SCREEN, 1);
+
+	/**
+	 * Command event when skip intro was requested.
+	 */
 	public Command skipIntroCmd = new Command("Skip", Command.SCREEN, 1);
+
+	/**
+	 * Element of UI for board display.
+	 */
+	public Board board = new Board(this);
+
+	/**
+	 * Element of UI for timers display and such.
+	 */
+	public Timers timers = new Timers(this);
+
+	/**
+	 * Element of UI for chat and logs.
+	 */
+	public Chat chat = new Chat(this);
 
 	/**
 	 * Is game thread in state of being stopped.
