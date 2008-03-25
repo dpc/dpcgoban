@@ -1,10 +1,7 @@
 import java.io.IOException;
 
-//import javax.microedition.lcdui.*;
-//import javax.microedition.m3g.*;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
-import java.lang.System;
 import javax.microedition.lcdui.Command;
 
 /**
@@ -13,7 +10,7 @@ import javax.microedition.lcdui.Command;
  * This is main controlling class. It has its own thread
  * to control game, networking etc.
  */
-public class Goban extends Canvas implements Runnable {
+public class Goban extends Canvas implements Runnable, UIElement.Parent {
 
 	/**
 	 * Command event when application close was requested.
@@ -87,15 +84,7 @@ public class Goban extends Canvas implements Runnable {
 			return;
 		}
 
-		//Set color to white
-		g.setColor( 0x0FFFFFF );
-		//Fill entire screen
-		g.fillRect( 0, 0, getWidth(), getHeight() );
-		//Set color to black
-		g.setColor( 0 );
-
-		g.drawString(Long.toString(time), 0, 0,
-			Graphics.TOP | Graphics.LEFT );
+		board.paint(g);
 	}
 
 	/**
@@ -127,5 +116,21 @@ public class Goban extends Canvas implements Runnable {
 	 */
 	public void stop() {
 		stopped = true;
+	}
+
+	public int getXDiv() {
+		return getWidth() * 3 / 4;
+	}
+
+	public int getYDiv() {
+		return getHeight() * 3 / 4;
+	}
+
+	public int getXSize() {
+		return getWidth();
+	}
+
+	public int getYSize() {
+		return getHeight();
 	}
 }
