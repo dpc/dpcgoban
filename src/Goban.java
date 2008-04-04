@@ -104,7 +104,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 			}
 
 			try {
-				Thread.sleep(1);
+				Thread.sleep(10);
 			} catch (InterruptedException e) {}
 		}
 	}
@@ -152,6 +152,10 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 			case GAME_B:
 				board.zoom(Board.ZOOM_OUT);
 				break;
+			case FIRE:
+				board.fire();
+				break;
+
 		}
 	}
 

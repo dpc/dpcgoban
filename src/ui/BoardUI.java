@@ -13,6 +13,7 @@ import java.lang.Math;
 class BoardUI extends UIElementCommon {
 	public static final int COLOR_BLACK = 0;
 	public static final int COLOR_WHITE = 1;
+	public static final int COLOR_NOTHING  = 2;
 	public static final int STATE_NORMAL = 0;
 	public static final int COLOR_NEW = 1;
 	public static final int COLOR_KO = 2;
@@ -21,7 +22,7 @@ class BoardUI extends UIElementCommon {
 	/**
 	 * Stone size in pixels.
 	 */
-	int stoneSize = 5;
+	int stoneSize = 7;
 	long lastTime = 0;
 	long firstTime = 0;
 
@@ -30,9 +31,11 @@ class BoardUI extends UIElementCommon {
 	 */
 	int boardSize;
 
-	int boardColor = 0x08F9F9F;
-	int lineColor = 0x0000000;
+	int boardColor = 0x0909090;
+	int lineColor = 0x0303030;
 	int backgroundColor= 0x000A000;
+	int whiteStoneColor= 0x0FFFFFF;
+	int blackStoneColor= 0x0000000;
 
 	/**
 	 * Croshair X in stones.
@@ -91,6 +94,47 @@ class BoardUI extends UIElementCommon {
 
 	public void drawStone(int x, int y, int color, int state) {
 		markDirty();
+
+		int cx = getStoneX(x);
+		int cy = getStoneY(y);
+		int ss = stoneSize - 2;
+		int gx = cx - ss / 2;
+		int gy = cy - ss / 2;
+
+		Graphics g = boardImage.getGraphics();
+		switch (color) {
+			case COLOR_BLACK:
+				g.setColor(blackStoneColor);
+				break;
+			case COLOR_WHITE:
+				g.setColor(whiteStoneColor);
+				break;
+			case COLOR_NOTHING:
+				g.setColor(boardColor);
+				break;
+		}
+		if (color == COLOR_NOTHING) {
+			g.fillRect(gx, gy, ss, ss);
+		} else {
+			g.fillRoundRect(gx, gy, ss, ss, ss, ss);
+		}
+
+		if (color == COLOR_NOTHING) {
+			g.setColor(lineColor);
+			float w = stoneSize / 2;
+			if (x != 0) {
+				g.drawLine((int)(cx - w), cy, cx, cy);
+			}
+			if (y != 0) {
+				g.drawLine(cx, (int)(cy - w), cx, cy);
+			}
+			if (x != boardSize - 1) {
+				g.drawLine((int)(cx + w), cy, cx, cy);
+			}
+			if (y != boardSize - 1) {
+				g.drawLine(cx, (int)(cy + w), cx, cy);
+			}
+		}
 
 	}
 
