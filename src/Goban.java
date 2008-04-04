@@ -146,6 +146,12 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 			case RIGHT:
 				board.move(Board.MOVE_RIGHT);
 				break;
+			case GAME_A:
+				board.zoom(Board.ZOOM_IN);
+				break;
+			case GAME_B:
+				board.zoom(Board.ZOOM_OUT);
+				break;
 		}
 	}
 

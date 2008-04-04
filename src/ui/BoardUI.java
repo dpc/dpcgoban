@@ -49,16 +49,18 @@ class BoardUI extends UIElementCommon {
 	 * Board offset on the screen - X;
 	 */
 	int sx;
+	int lastSx;
 
 	/**
 	 * Board offset on the screen - Y;
 	 */
 	int sy;
+	int lastSy;
 
 	/**
 	 * Board background visible.
 	 */
-	boolean backgroundVisible;
+	boolean bgRefreshNeeded;
 
 
 	/**
@@ -73,12 +75,18 @@ class BoardUI extends UIElementCommon {
 	public void resetBoard(int boardSize, int stoneSize) {
 		markDirty();
 
+		int oldcx = getStoneX(cx);
+		int oldcy = getStoneY(cy);
 		setBoardSize(boardSize);
 		setStoneSize(stoneSize);
 
+		lastSx -= getStoneX(cx) - oldcx;
+		lastSy -= getStoneY(cy) - oldcy;
+
 		recreateBoardImage();
 		drawEmptyBoard();
-		cy = cx = boardSize / 2;
+		int c = boardSize / 2;
+		setCrosshairPosition(c, c);
 	}
 
 	public void drawStone(int x, int y, int color, int state) {
@@ -137,6 +145,7 @@ class BoardUI extends UIElementCommon {
 
 	protected void recreateBoardImage() {
 		int size = boardImageSize() + 1;
+		bgRefreshNeeded = true;
 
 		boardImage = Image.createImage(size, size);
 		Graphics g = boardImage.getGraphics();
@@ -147,6 +156,12 @@ class BoardUI extends UIElementCommon {
 	}
 
 	protected void setStoneSize(int size) {
+		int maxSize = Math.min(parent.getXDiv(), parent.getYDiv()) / 3;
+		if (size < 3) {
+			size = 3;
+		} else if (size > 30) {
+			size = 30;
+		}
 		stoneSize = size;
 	}
 
@@ -169,29 +184,55 @@ class BoardUI extends UIElementCommon {
 	 * Recheck if background is visible and if board needs any offset.
 	 */
 	void checkBoardOffset() {
+		int marginSensitivity = stoneSize * 2;
 		sx = sy = 0;
 
-		backgroundVisible = false;
 
 		if (boardImage == null) {
-			backgroundVisible = true;
+			bgRefreshNeeded = true;
 			return;
 		}
 
 		if (parent.getXDiv() > boardImage.getWidth()) {
 			sx = (parent.getXDiv() - boardImage.getWidth()) / 2;
-			backgroundVisible = true;
+			bgRefreshNeeded = true;
+		} else {
+			sx = lastSx;
+			int x = getStoneX(cx);
+			if (x + sx <= marginSensitivity) {
+				bgRefreshNeeded = true;
+				sx = - (x - getStoneX(1));
+			} else if (x + sx >= parent.getXDiv() - marginSensitivity) {
+				bgRefreshNeeded = true;
+				sx = - (x - (parent.getXDiv() - getStoneX(1)));
+			}
 		}
+
 		if (parent.getYDiv() > boardImage.getHeight()) {
 			sy = (parent.getYDiv() - boardImage.getHeight()) / 2;
-			backgroundVisible = true;
+			bgRefreshNeeded = true;
+		} else {
+			sy = lastSy;
+			int y = getStoneY(cy);
+			if (y + sy <= marginSensitivity) {
+				bgRefreshNeeded = true;
+				sy = - (y - getStoneY(1));
+			} else if (y + sy >= parent.getYDiv() - marginSensitivity) {
+				bgRefreshNeeded = true;
+				sy = - (y - (parent.getYDiv() - getStoneY(1)));
+			}
 		}
+		lastSx = sx;
+		lastSy = sy;
+
 	}
 
 	protected void repaint(Graphics g) {
-		checkBoardOffset();
+		if (boardImage != null) {
+			checkBoardOffset();
+		}
 
-		if (backgroundVisible) {
+		if (bgRefreshNeeded || boardImage == null) {
 			g.setColor(backgroundColor);
 			g.fillRect(0, 0, parent.getXDiv(), parent.getYDiv());
 		}
@@ -211,6 +252,7 @@ class BoardUI extends UIElementCommon {
 	public void paint(Graphics g) {
 		super.paint(g);
 		paintCrosshair(g);
+		bgRefreshNeeded = false;
 		lastTime = System.currentTimeMillis();
 	}
 
@@ -219,6 +261,7 @@ class BoardUI extends UIElementCommon {
 			return;
 		}
 
+		g.clipRect(0, 0, parent.getXDiv(), parent.getYDiv());
 		long time = System.currentTimeMillis();
 
 		int c = (int)(Math.sin((firstTime - time) / 100) * 100) + 128;
