@@ -25,7 +25,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	/**
 	 * Element of UI for board display.
 	 */
-	public Board board = new Board(this);
+	public BoardUI boardui = new BoardUI(this);
 
 	/**
 	 * Element of UI for timers display and such.
@@ -36,6 +36,11 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	 * Element of UI for chat and logs.
 	 */
 	public Chat chat = new Chat(this);
+
+	/**
+	 * Board representation.
+	 */
+	public Board board = null;
 
 	/**
 	 * Is game thread in state of being stopped.
@@ -69,6 +74,8 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 			/* fails on problems with textures etc. */
 			stopped = true;
 		}
+
+		board = new Board(boardui);
 	}
 
 	/**
@@ -84,7 +91,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 			return;
 		}
 
-		board.paint(g);
+		boardui.paint(g);
 	}
 
 	/**
@@ -97,7 +104,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 			}
 
 			try {
-				Thread.sleep(100);
+				Thread.sleep(1);
 			} catch (InterruptedException e) {}
 		}
 	}
@@ -116,6 +123,30 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	 */
 	public void stop() {
 		stopped = true;
+	}
+
+	/**
+	 * Handle key presses.
+	 */
+	public void keyPressed(int keycode) {
+		if (board == null) {
+			return;
+		}
+
+		switch (getGameAction(keycode)) {
+			case UP:
+				board.move(Board.MOVE_UP);
+				break;
+			case DOWN:
+				board.move(Board.MOVE_DOWN);
+				break;
+			case LEFT:
+				board.move(Board.MOVE_LEFT);
+				break;
+			case RIGHT:
+				board.move(Board.MOVE_RIGHT);
+				break;
+		}
 	}
 
 	public int getXDiv() {
