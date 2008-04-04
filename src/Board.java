@@ -17,6 +17,9 @@ class Board {
 	protected BoardUI ui;
 	protected int boardSize = 19;
 
+	protected int lastMoveX = 0;
+	protected int lastMoveY = 0;
+
 	protected int colors[][];
 
 	Board(BoardUI ui) {
@@ -74,16 +77,34 @@ class Board {
 		}
 	}
 
+	public int getStoneState(int x, int y) {
+		int state = BoardUI.STATE_NORMAL;
+
+		if (x == lastMoveX && y == lastMoveY) {
+			state = BoardUI.STATE_LAST;
+		}
+		return state;
+	}
+
 	public void setStone(int x, int y, int color) {
-		ui.drawStone(x, y, color, BoardUI.STATE_NORMAL);
+		ui.drawStone(x, y, color, getStoneState(x, y));
 		colors[x][y] = color;
+	}
+
+	public void move(int x, int y, int color) {
+		int lmx = lastMoveX;
+		int lmy = lastMoveY;
+		lastMoveX = x;
+		lastMoveY = y;
+		setStone(lmx, lmy, colors[lmx][lmy]);
+		setStone(x, y, color);
 	}
 
 	public void redrawBoard() {
 		for (int x = 0; x < boardSize; ++x) {
 			for (int y = 0; y < boardSize; ++y) {
 				if (colors[x][y] != BoardUI.COLOR_NOTHING) {
-					ui.drawStone(x, y, colors[x][y], BoardUI.STATE_NORMAL);
+					ui.drawStone(x, y, colors[x][y], getStoneState(x, y));
 				}
 			}
 		}
@@ -91,11 +112,11 @@ class Board {
 
 	int c = 0;
 	public void fire() {
-		c = (c+1)%3;
+		c = (c+1)%2;
 		int x = ui.getCrosshairX();
 		int y = ui.getCrosshairY();
 
-		setStone(x, y, c);
+		move(x, y, c);
 	}
 
 }

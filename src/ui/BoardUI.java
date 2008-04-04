@@ -15,8 +15,8 @@ class BoardUI extends UIElementCommon {
 	public static final int COLOR_WHITE = 1;
 	public static final int COLOR_NOTHING  = 2;
 	public static final int STATE_NORMAL = 0;
-	public static final int COLOR_NEW = 1;
-	public static final int COLOR_KO = 2;
+	public static final int STATE_LAST = 1;
+	public static final int STATE_KO = 2;
 
 	Image boardImage = null;
 	/**
@@ -31,9 +31,12 @@ class BoardUI extends UIElementCommon {
 	 */
 	int boardSize;
 
-	int boardColor = 0x0909090;
-	int lineColor = 0x0303030;
-	int backgroundColor= 0x000A000;
+	//int boardColor = 0x0909090;
+	int boardColor = 0x0939565;
+	//int lineColor = 0x0303030;
+	int lineColor = 0x054553a;
+	//int backgroundColor= 0x000A000;
+	int backgroundColor= 0x0075a11;
 	int whiteStoneColor= 0x0FFFFFF;
 	int blackStoneColor= 0x0000000;
 
@@ -92,12 +95,41 @@ class BoardUI extends UIElementCommon {
 		setCrosshairPosition(c, c);
 	}
 
+	public void drawEmptyStone(int x, int y, int ss) {
+		Graphics g = boardImage.getGraphics();
+		int cx = getStoneX(x);
+		int cy = getStoneY(y);
+
+		g.setColor(lineColor);
+		float w = stoneSize / 2;
+		if (x != 0) {
+			g.drawLine((int)(cx - w), cy, cx, cy);
+		}
+		if (y != 0) {
+			g.drawLine(cx, (int)(cy - w), cx, cy);
+		}
+		if (x != boardSize - 1) {
+			g.drawLine((int)(cx + w), cy, cx, cy);
+		}
+		if (y != boardSize - 1) {
+			g.drawLine(cx, (int)(cy + w), cx, cy);
+		}
+
+		if (boardSize == 19) {
+			if ((x + 3) % 6  == 0 &&
+				(y + 3) % 6  == 0) {
+				g.drawLine(cx-1, cy-1, cx+1, cy+1);
+				g.drawLine(cx-1, cy+1, cx+1, cy-1);
+				}
+		}
+	}
 	public void drawStone(int x, int y, int color, int state) {
 		markDirty();
 
 		int cx = getStoneX(x);
 		int cy = getStoneY(y);
 		int ss = stoneSize - 2;
+		if (ss == 1) { ss = 3; }
 		int gx = cx - ss / 2;
 		int gy = cy - ss / 2;
 
@@ -120,19 +152,27 @@ class BoardUI extends UIElementCommon {
 		}
 
 		if (color == COLOR_NOTHING) {
-			g.setColor(lineColor);
-			float w = stoneSize / 2;
-			if (x != 0) {
-				g.drawLine((int)(cx - w), cy, cx, cy);
+			drawEmptyStone(x, y, ss);
+		} else if (state == STATE_LAST) {
+			int sss = (stoneSize - 1) / 2;
+			sss /= 2;
+			sss *= 2;
+			if (sss < 0) { sss = 0; }
+			int gxx = cx - sss / 2;
+			int gyy = cy - sss / 2;
+
+			switch (color) {
+				case COLOR_WHITE:
+					g.setColor(blackStoneColor);
+					break;
+				case COLOR_BLACK:
+					g.setColor(whiteStoneColor);
+					break;
 			}
-			if (y != 0) {
-				g.drawLine(cx, (int)(cy - w), cx, cy);
-			}
-			if (x != boardSize - 1) {
-				g.drawLine((int)(cx + w), cy, cx, cy);
-			}
-			if (y != boardSize - 1) {
-				g.drawLine(cx, (int)(cy + w), cx, cy);
+			if (sss <= 2) {
+				g.drawLine(cx, cy, cx, cy);
+			} else {
+				g.drawRoundRect(gxx, gyy, sss, sss, sss, sss);
 			}
 		}
 
@@ -184,6 +224,18 @@ class BoardUI extends UIElementCommon {
 			int x1 = getStoneX(0);
 			int x2 = getStoneX(boardSize - 1);
 			g.drawLine(x1, y, x2, y);
+		}
+
+		if (boardSize == 19) {
+			for (int x = 0; x < boardSize; ++x) {
+				if ((x + 3) % 6  == 0) {
+					for (int y = 0; y < boardSize; ++y) {
+						if ((y + 3) % 6  == 0) {
+							drawStone(x, y, COLOR_NOTHING, STATE_NORMAL);
+						}
+					}
+				}
+			}
 		}
 	}
 

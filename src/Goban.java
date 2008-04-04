@@ -104,7 +104,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 			}
 
 			try {
-				Thread.sleep(10);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {}
 		}
 	}
