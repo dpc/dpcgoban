@@ -3,6 +3,9 @@ import java.io.IOException;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Command;
+import javax.microedition.media.*;
+
+import javax.microedition.media.control.*;
 
 /**
  * Game board, timers and everything used to play go.
@@ -26,6 +29,8 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	 * Element of UI for board display.
 	 */
 	public BoardUI boardui = new BoardUI(this);
+
+	Player player;
 
 	/**
 	 * Element of UI for timers display and such.
@@ -74,6 +79,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 			/* fails on problems with textures etc. */
 			stopped = true;
 		}
+		playMusic();
 
 		board = new Board(boardui);
 	}
@@ -91,7 +97,9 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 			return;
 		}
 
+		timers.paint(g);
 		boardui.paint(g);
+		chat.paint(g);
 	}
 
 	/**
@@ -125,6 +133,33 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 		stopped = true;
 	}
 
+	public void playMusic() {
+		try
+		{
+			player = Manager.createPlayer(
+				getClass().getResourceAsStream("/intro.midi"), "audio/midi"
+				);
+			// XXX: FIXME: setting volume makes player silent
+			//VolumeControl vc = (VolumeControl) player.getControl("VolumeControl");
+			//vc.setLevel(100);
+			player.start();
+		}
+		catch (Exception e)
+		{
+			System.out.println(e);
+		}
+	}
+
+	public void stopMusic() {
+		try
+		{
+			player.stop();
+		}
+		catch (Exception e)
+		{
+			System.out.println(e);
+		}
+	}
 	/**
 	 * Handle key presses.
 	 */
@@ -135,22 +170,22 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 
 		switch (getGameAction(keycode)) {
 			case UP:
-				board.move(Board.MOVE_UP);
+				board.moveCrosshair(Board.MOVE_UP);
 				break;
 			case DOWN:
-				board.move(Board.MOVE_DOWN);
+				board.moveCrosshair(Board.MOVE_DOWN);
 				break;
 			case LEFT:
-				board.move(Board.MOVE_LEFT);
+				board.moveCrosshair(Board.MOVE_LEFT);
 				break;
 			case RIGHT:
-				board.move(Board.MOVE_RIGHT);
+				board.moveCrosshair(Board.MOVE_RIGHT);
 				break;
 			case GAME_A:
-				board.zoom(Board.ZOOM_IN);
+				board.zoomView(Board.ZOOM_IN);
 				break;
 			case GAME_B:
-				board.zoom(Board.ZOOM_OUT);
+				board.zoomView(Board.ZOOM_OUT);
 				break;
 			case FIRE:
 				board.fire();
@@ -164,7 +199,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	}
 
 	public int getYDiv() {
-		return getHeight() * 3 / 4;
+		return getHeight() * 5 / 6;
 	}
 
 	public int getXSize() {

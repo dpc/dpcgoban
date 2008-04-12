@@ -1,4 +1,7 @@
 
+import javax.microedition.media.*;
+import java.io.*;
+import javax.microedition.media.control.*;
 
 /**
  * Internal board representation.
@@ -30,7 +33,19 @@ class Board {
 		clearBoard();
 	}
 
-	void move(int dir) {
+	public void makeMoveSound() {
+		try {
+			InputStream is = this.getClass().getResourceAsStream("/move.wav");
+			Player p = Manager.createPlayer(is, "audio/x-wav");
+			p.realize();
+			VolumeControl vc = (VolumeControl) p.getControl("VolumeControl");
+			vc.setLevel(100);
+			p.start();
+		} catch (Exception ex) {
+			//System.out.printnln(ex.getMessage());
+		}
+	}
+	void moveCrosshair(int dir) {
 		int x = ui.getCrosshairX();
 		int y = ui.getCrosshairY();
 		switch (dir) {
@@ -50,7 +65,7 @@ class Board {
 		ui.setCrosshairPosition(x, y);
 	}
 
-	void zoom(int dir) {
+	void zoomView(int dir) {
 		int size = ui.getStoneSize();
 		int x = ui.getCrosshairX();
 		int y = ui.getCrosshairY();
@@ -92,6 +107,7 @@ class Board {
 	}
 
 	public void move(int x, int y, int color) {
+		makeMoveSound();
 		int lmx = lastMoveX;
 		int lmy = lastMoveY;
 		lastMoveX = x;

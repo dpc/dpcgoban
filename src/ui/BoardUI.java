@@ -324,6 +324,8 @@ class BoardUI extends UIElementCommon {
 	}
 
 	protected void repaint(Graphics g) {
+		g.setClip(0, 0, parent.getXDiv(), parent.getYDiv());
+
 		if (boardImage != null) {
 			checkBoardOffset();
 		}
@@ -334,7 +336,6 @@ class BoardUI extends UIElementCommon {
 		}
 
 		if (boardImage != null) {
-			g.clipRect(0, 0, parent.getXDiv(), parent.getYDiv());
 			g.drawImage(boardImage, sx, sy, Graphics.TOP|Graphics.LEFT);
 		}
 
@@ -343,7 +344,8 @@ class BoardUI extends UIElementCommon {
 	/**
 	 * Repaint board.
 	 *
-	 * Board need redrawing crosshair every time, so it overloads paint function.
+	 * Board need redrawing crosshair every time, so it overloads
+	 * paint function.
 	 */
 	public void paint(Graphics g) {
 		super.paint(g);
