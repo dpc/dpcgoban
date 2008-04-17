@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en-GB" lang="en-GB">
+    <head>
+<title>P2AGTP Draft</title>
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="style.css" />
+    </head>
+    <body>
+<!-- created using md2html script -->
+<h1>P2AGTP Draft</h1>
+
+<h2>Intruduction</h2>
+<p>This document gives a specification of the Engine to Arbiter Go Text Protocol (P2AGTP).
+</p>
+
+<h3>Rationale</h3>
+<p>Despite GTP is well made protocol it suites only go playing programs communication.
+   It has many limitations that makes it impossible (or impractical at least) to use it for pure human online Go gaming.
+   Those limitations were main reason of P2AGTP creation.
+</p>
+
+<h3>Communication Model</h3>
+<p>The protocol is asymmetric and involves two parties, which we call <em>Arbiter</em> and <em>Player</em>.
+</p>
+<p>The <em>Player</em> is typically some kind of Go-playing interface like a program to play Go online, but may be as well a go playing program (an <em>engine</em> in GTP nomenclature). The main activity of a <em>Player</em> is playing a game (generating moves) or watching its progress (_observing_).
+</p>
+<p>The <em>Arbiter</em> manages board state, knows go game logic and validates <em>Players</em> actions.
+</p>
+<p>Typical situation involves one <em>Arbiter</em> and at least two <em>Players</em>. Each <em>Player</em> is connected to <em>Arbiter</em> via some error-free character-oriented communication channel (i.e. TCP/IP connection or UNIX pipe). Each such <em>Arbiter</em>-_Player_ connection is independent communication entity and everything described in this specification describes one such channel.
+</p>
+<p>All communication is request-response based and may be initiated by both <em>Arbiter</em> and <em>Player</em>.
+</p>
+
+<h2>Protocol Basis</h2>
+
+<h3>Character Set</h3>
+<p>All exchanged messages are considered as UTF-8 strings.
+   Each request have a numeric ID and must be responded before any later requests.
+</p>
+
+<h3>Whitespace</h3>
+<p>The following characters are considered as whitespace delimiter in the protocol:
+</p>
+<ul>
+ <li>
+     SPACE (dec 32)
+ </li>
+
+ <li>
+     HT (dec 9)
+ </li>
+</ul>
+<p>In the rest of the specification 'space' is used to denote a whitespace. On input this may be either one or more SPACE or HT characters. SPACE and HT can be mixed.
+</p>
+
+<h3>Newline Convention</h3>
+<p>All messages (both requests and responses) are ended with single line break LF (dec 10) character. The CR (dec 13) should not be used and should be discarded on input.
+</p>
+
+<h3>Request structure</h3>
+<p>A command should is exacly one line long, white a syntax:
+</p>
+<p><tt>
+       id command_name [arguments]
+   </tt>
+</p>
+<div id="footer">
+    <a href="http://daringfireball.net/projects/markdown/"
+    	    id="poweredByMarkdown">Powered by
+    Markdown</a>
+</div>
+    </body>
+</html>

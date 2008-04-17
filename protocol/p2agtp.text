@@ -1,0 +1,75 @@
+P2AGTP Draft
+============
+
+Intruduction
+------------
+
+This document gives a specification of the Engine to Arbiter Go Text Protocol (P2AGTP).
+
+### Rationale
+
+Despite GTP is well made protocol it suites only go playing programs communication.
+It has many limitations that makes it impossible (or impractical at least) to use it for pure human online Go gaming.
+Those limitations were main reason of P2AGTP creation.
+
+### Communication Model
+
+The protocol is asymmetric and involves two parties, which we call _Arbiter_ and _Player_.
+
+The _Player_ is typically some kind of Go-playing interface like a program to play Go online, but may be as well a go playing program (an _engine_ in GTP nomenclature). The main activity of a _Player_ is playing a game (generating moves) or watching its progress (_observing_).
+
+The _Arbiter_ manages board state, knows go game logic and validates _Players_ actions.
+
+Typical situation involves one _Arbiter_ and at least two _Players_. Each _Player_ is connected to _Arbiter_ via some error-free character-oriented communication channel (i.e. TCP/IP connection or UNIX pipe). Each such _Arbiter_-_Player_ connection is independent communication entity and everything described in this specification describes one such channel.
+
+All communication is request-response based and may be initiated by both _Arbiter_ and _Player_.
+
+Protocol Basis
+--------------
+
+### Character Set
+
+All exchanged messages are considered as UTF-8 strings.
+Each request have a numeric ID and must be responded before any later requests.
+
+
+### Whitespace
+The following characters are considered as whitespace delimiter in the protocol:
+
+* SPACE (dec 32)
+* HT (dec 9)
+
+In the rest of the specification 'space' is used to denote a whitespace. On input this may be either one or more SPACE or HT characters. SPACE and HT can be mixed.
+
+###  Newline Convention
+All messages (both requests and responses) are ended with single line break LF (dec 10) character. The CR (dec 13) should not be used and should be discarded on input.
+
+### Request Structure
+A command should is exactly one line long, whit a syntax:
+
+<tt>
+	id command_name [arguments]
+</tt>
+
+The <tt>id</tt> is mandatory number that must start from zero and be increased each time new request is being sent. Note that both sides of communication use independent counters.
+
+### Response Structure
+
+If successful other party returns a response of the form:
+
+<tt>
+	=id result
+</tt>
+
+if unsuccessful:
+
+<tt>
+	?id error_message
+</tt>
+
+Where <tt>id</tt> is an id of the request that is being responded. Note that
+
+### Timing
+Responses must be sent in order (id order). To eliminate deadlocks each party must answer requests independently from waiting for their own requests responses.
+
+There are no other synchronization requirements between _Arbiter_ and _Player_.
