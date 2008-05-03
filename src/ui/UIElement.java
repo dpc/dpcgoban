@@ -16,4 +16,6 @@ interface UIElement {
 	 * Repaint element.
 	 */
 	public void paint(Graphics g);
+
+	public void markDirty();
 }

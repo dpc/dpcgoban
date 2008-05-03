@@ -10,14 +10,7 @@ import java.lang.Math;
  * This class manages board displaying. It is dumb about
  * what is being one it.
  */
-class BoardUI extends UIElementCommon {
-	public static final int COLOR_BLACK = 0;
-	public static final int COLOR_WHITE = 1;
-	public static final int COLOR_NOTHING  = 2;
-	public static final int STATE_NORMAL = 0;
-	public static final int STATE_LAST = 1;
-	public static final int STATE_KO = 2;
-
+class BoardView extends UIElementCommon {
 	Image boardImage = null;
 	/**
 	 * Stone size in pixels.
@@ -68,11 +61,10 @@ class BoardUI extends UIElementCommon {
 	 */
 	boolean bgRefreshNeeded;
 
-
 	/**
 	 * Ctor.
 	 */
-	public BoardUI(Parent parent) {
+	public BoardView(Parent parent) {
 		super(parent);
 
 		firstTime = System.currentTimeMillis();
@@ -123,6 +115,7 @@ class BoardUI extends UIElementCommon {
 				}
 		}
 	}
+
 	public void drawStone(int x, int y, int color, int state) {
 		markDirty();
 
@@ -135,25 +128,25 @@ class BoardUI extends UIElementCommon {
 
 		Graphics g = boardImage.getGraphics();
 		switch (color) {
-			case COLOR_BLACK:
+			case Board.COLOR_BLACK:
 				g.setColor(blackStoneColor);
 				break;
-			case COLOR_WHITE:
+			case Board.COLOR_WHITE:
 				g.setColor(whiteStoneColor);
 				break;
-			case COLOR_NOTHING:
+			case Board.COLOR_NOTHING:
 				g.setColor(boardColor);
 				break;
 		}
-		if (color == COLOR_NOTHING) {
+		if (color == Board.COLOR_NOTHING) {
 			g.fillRect(gx, gy, ss, ss);
 		} else {
 			g.fillRoundRect(gx, gy, ss, ss, ss, ss);
 		}
 
-		if (color == COLOR_NOTHING) {
+		if (color == Board.COLOR_NOTHING) {
 			drawEmptyStone(x, y, ss);
-		} else if (state == STATE_LAST) {
+		} else if (state == Board.STATE_LAST) {
 			int sss = (stoneSize - 1) / 2;
 			sss /= 2;
 			sss *= 2;
@@ -162,10 +155,10 @@ class BoardUI extends UIElementCommon {
 			int gyy = cy - sss / 2;
 
 			switch (color) {
-				case COLOR_WHITE:
+				case Board.COLOR_WHITE:
 					g.setColor(blackStoneColor);
 					break;
-				case COLOR_BLACK:
+				case Board.COLOR_BLACK:
 					g.setColor(whiteStoneColor);
 					break;
 			}
@@ -231,7 +224,7 @@ class BoardUI extends UIElementCommon {
 				if ((x + 3) % 6  == 0) {
 					for (int y = 0; y < boardSize; ++y) {
 						if ((y + 3) % 6  == 0) {
-							drawStone(x, y, COLOR_NOTHING, STATE_NORMAL);
+							drawStone(x, y, Board.COLOR_NOTHING, Board.STATE_NORMAL);
 						}
 					}
 				}
@@ -276,50 +269,58 @@ class BoardUI extends UIElementCommon {
 		return getStoneX(i);
 	}
 
+	int lastXDiv, lastYDiv;
+
 	/**
 	 * Recheck if background is visible and if board needs any offset.
 	 */
 	void checkBoardOffset() {
 		int marginSensitivity = stoneSize * 2;
 		sx = sy = 0;
-
+		int xDiv = parent.getXDiv();
+		int yDiv = parent.getYDiv();
 
 		if (boardImage == null) {
 			bgRefreshNeeded = true;
 			return;
 		}
 
-		if (parent.getXDiv() > boardImage.getWidth()) {
-			sx = (parent.getXDiv() - boardImage.getWidth()) / 2;
-			bgRefreshNeeded = true;
+		bgRefreshNeeded |= (lastXDiv != xDiv);
+		bgRefreshNeeded |= (lastYDiv != yDiv);
+
+		if (xDiv > boardImage.getWidth()) {
+			sx = (xDiv - boardImage.getWidth()) / 2;
+			bgRefreshNeeded |= true;
 		} else {
 			sx = lastSx;
 			int x = getStoneX(cx);
 			if (x + sx <= marginSensitivity) {
-				bgRefreshNeeded = true;
+				bgRefreshNeeded |= true;
 				sx = - (x - getStoneX(1));
-			} else if (x + sx >= parent.getXDiv() - marginSensitivity) {
-				bgRefreshNeeded = true;
-				sx = - (x - (parent.getXDiv() - getStoneX(1)));
+			} else if (x + sx >= xDiv - marginSensitivity) {
+				bgRefreshNeeded |= true;
+				sx = - (x - (xDiv - getStoneX(1)));
 			}
 		}
 
-		if (parent.getYDiv() > boardImage.getHeight()) {
-			sy = (parent.getYDiv() - boardImage.getHeight()) / 2;
-			bgRefreshNeeded = true;
+		if (yDiv > boardImage.getHeight()) {
+			sy = (yDiv - boardImage.getHeight()) / 2;
+			bgRefreshNeeded |= true;
 		} else {
 			sy = lastSy;
 			int y = getStoneY(cy);
 			if (y + sy <= marginSensitivity) {
-				bgRefreshNeeded = true;
+				bgRefreshNeeded |= true;
 				sy = - (y - getStoneY(1));
-			} else if (y + sy >= parent.getYDiv() - marginSensitivity) {
-				bgRefreshNeeded = true;
-				sy = - (y - (parent.getYDiv() - getStoneY(1)));
+			} else if (y + sy >= yDiv - marginSensitivity) {
+				bgRefreshNeeded |= true;
+				sy = - (y - (yDiv - getStoneY(1)));
 			}
 		}
 		lastSx = sx;
 		lastSy = sy;
+		lastXDiv = xDiv;
+		lastYDiv = yDiv;
 
 	}
 
@@ -333,6 +334,7 @@ class BoardUI extends UIElementCommon {
 		if (bgRefreshNeeded || boardImage == null) {
 			g.setColor(backgroundColor);
 			g.fillRect(0, 0, parent.getXDiv(), parent.getYDiv());
+			bgRefreshNeeded = false;
 		}
 
 		if (boardImage != null) {

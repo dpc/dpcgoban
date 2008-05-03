@@ -12,7 +12,7 @@ class UIElementCommon implements UIElement {
 		needsRedraw = true;
 	}
 
-	protected void markDirty() {
+	public void markDirty() {
 		needsRedraw = true;
 	}
 

@@ -28,7 +28,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	/**
 	 * Element of UI for board display.
 	 */
-	public BoardUI boardui = new BoardUI(this);
+	public BoardView boardui = new BoardView(this);
 
 	Player player;
 
@@ -64,6 +64,11 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	 */
 	private Intro demo;
 
+
+	public boolean timerToggled = false;
+	public boolean chatToggled = false;
+
+	public LocalGameController gameController;
 	/**
 	 * Ctor.
 	 */
@@ -82,6 +87,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 		playMusic();
 
 		board = new Board(boardui);
+		gameController = new LocalGameController(board);
 	}
 
 	/**
@@ -142,7 +148,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 			// XXX: FIXME: setting volume makes player silent
 			//VolumeControl vc = (VolumeControl) player.getControl("VolumeControl");
 			//vc.setLevel(100);
-			player.start();
+			//player.start();
 		}
 		catch (Exception e)
 		{
@@ -187,18 +193,38 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 			case GAME_B:
 				board.zoomView(Board.ZOOM_OUT);
 				break;
+			case GAME_C:
+				timerToggled = !timerToggled;
+				repaintUI();
+				break;
+			case GAME_D:
+				chatToggled = !chatToggled;
+				repaintUI();
+				break;
 			case FIRE:
-				board.fire();
+				gameController.moveRequest();
 				break;
 
 		}
 	}
 
+	public void repaintUI() {
+		timers.markDirty();
+		boardui.markDirty();
+		chat.markDirty();
+	}
+
 	public int getXDiv() {
+		if (timerToggled) {
+			return getWidth();
+		}
 		return getWidth() * 3 / 4;
 	}
 
 	public int getYDiv() {
+		if (chatToggled) {
+			return getHeight();
+		}
 		return getHeight() * 5 / 6;
 	}
 
