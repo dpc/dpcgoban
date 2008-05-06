@@ -58,12 +58,36 @@
 <p>All messages (both requests and responses) are ended with single line break LF (dec 10) character. The CR (dec 13) should not be used and should be discarded on input.
 </p>
 
-<h3>Request structure</h3>
-<p>A command should is exacly one line long, white a syntax:
+<h3>Request Structure</h3>
+<p>A command should is exactly one line long, whit a syntax:
 </p>
 <p><tt>
        id command_name [arguments]
    </tt>
+</p>
+<p>The <tt>id</tt> is mandatory number that must start from zero and be increased each time new request is being sent. Note that both sides of communication use independent counters.
+</p>
+
+<h3>Response Structure</h3>
+<p>If successful other party returns a response of the form:
+</p>
+<p><tt>
+       =id result
+   </tt>
+</p>
+<p>if unsuccessful:
+</p>
+<p><tt>
+       ?id error_message
+   </tt>
+</p>
+<p>Where <tt>id</tt> is an id of the request that is being responded. Note that
+</p>
+
+<h3>Timing</h3>
+<p>Responses must be sent in order (id order). To eliminate deadlocks each party must answer requests independently from waiting for their own requests responses.
+</p>
+<p>There are no other synchronization requirements between <em>Arbiter</em> and <em>Player</em>.
 </p>
 <div id="footer">
     <a href="http://daringfireball.net/projects/markdown/"
