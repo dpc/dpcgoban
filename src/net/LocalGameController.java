@@ -7,7 +7,10 @@ class LocalGameController implements GameController {
 
 	public LocalGameController(Board board) {
 		this.board = board;
-		this.arbiter = new LocalArbiter();
+	}
+
+	public void connect(Arbiter arbiter) {
+		this.arbiter = arbiter;
 		arbiter.connect(this);
 	}
 

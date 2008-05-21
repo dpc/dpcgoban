@@ -362,10 +362,16 @@ class BoardView extends UIElementCommon {
 		}
 
 		g.clipRect(0, 0, parent.getXDiv(), parent.getYDiv());
-		long time = System.currentTimeMillis();
 
-		int c = (int)(Math.sin((firstTime - time) / 100) * 100) + 128;
-		g.setColor(((c * 256) + c) * 256 + c );
+		if (parent.isActive()) {
+			long time = System.currentTimeMillis();
+			int c = (int)(Math.sin((firstTime - time) / 100) * 100) + 128;
+			g.setColor(((c * 256) + c) * 256 + c );
+		} else {
+			int c = 128;
+			g.setColor(((c * 256) + c) * 256 + c );
+		}
+
 		int x = getStoneX(cx) + sx;
 		int y = getStoneY(cy) + sy;
 

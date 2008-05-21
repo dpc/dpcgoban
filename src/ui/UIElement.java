@@ -10,6 +10,7 @@ interface UIElement {
 		public int getYDiv();
 		public int getXSize();
 		public int getYSize();
+		public boolean isActive();
 	}
 
 	/**

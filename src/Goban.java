@@ -18,18 +18,24 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	/**
 	 * Command event when application close was requested.
 	 */
-	public Command exitCmd = new Command("Exit", Command.SCREEN, 1);
+	public Command exitCmd = new Command("Exit", Command.BACK, 10);
 
 	/**
 	 * Command event when skip intro was requested.
 	 */
-	public Command skipIntroCmd = new Command("Skip", Command.SCREEN, 1);
+	public Command skipIntroCmd = new Command("Skip", Command.SCREEN, 10);
 
 	/**
 	 * Element of UI for board display.
 	 */
 	public BoardView boardui = new BoardView(this);
 
+	public Command beClientCmd = new Command("Connect to remote", Command.SCREEN, 1);
+	public Command beServerCmd = new Command("Host game", Command.SCREEN, 1);
+	public Command playWhiteCmd = new Command("Play white", Command.SCREEN, 1);
+	public Command playBlackCmd = new Command("Play black", Command.SCREEN, 1);
+
+	public Command printHelpCmd = new Command("Print help", Command.HELP, 1);
 	Player player;
 
 	/**
@@ -69,6 +75,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	public boolean chatToggled = false;
 
 	public LocalGameController gameController;
+
 	/**
 	 * Ctor.
 	 */
@@ -87,7 +94,28 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 		playMusic();
 
 		board = new Board(boardui);
+		chat.appendString("Welcome in DPC Goban!");
+		chat.appendString("Connect to or host a game to start.");
+		chat.appendString("---");
+	}
+
+	public void beServer() {
+		Arbiter arbiter = new LocalArbiter();
 		gameController = new LocalGameController(board);
+		gameController.connect(arbiter);
+	}
+
+	public void beClient() {
+	}
+	public void playBlack() {
+	}
+	public void playWhite() {
+	}
+
+	public void printUIHelp() {
+		chat.appendString("1, 3 - zoom in/out");
+		chat.appendString("7, 9 - toggle side, chat bars");
+		chat.appendString("arrows - move; action - place stone");
 	}
 
 	/**
@@ -129,6 +157,11 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	public void skipIntro() {
 		removeCommand(skipIntroCmd);
 		addCommand(exitCmd);
+		addCommand(playWhiteCmd);
+		addCommand(playBlackCmd);
+		addCommand(beClientCmd);
+		addCommand(beServerCmd);
+		addCommand(printHelpCmd);
 		demo = null;
 	}
 
@@ -145,7 +178,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 			player = Manager.createPlayer(
 				getClass().getResourceAsStream("/intro.midi"), "audio/midi"
 				);
-			// XXX: FIXME: setting volume makes player silent
+			// TODO: XXX: FIXME: setting volume makes player silent
 			//VolumeControl vc = (VolumeControl) player.getControl("VolumeControl");
 			//vc.setLevel(100);
 			//player.start();
@@ -202,10 +235,16 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 				repaintUI();
 				break;
 			case FIRE:
-				gameController.moveRequest();
+				if (gameController != null) {
+					gameController.moveRequest();
+				}
 				break;
 
 		}
+	}
+
+	public boolean isActive() {
+		return gameController != null;
 	}
 
 	public void repaintUI() {
