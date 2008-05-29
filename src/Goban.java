@@ -18,22 +18,22 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	/**
 	 * Command event when application close was requested.
 	 */
-	public Command exitCmd = new Command("Exit", Command.BACK, 10);
+	public Command exitCmd = new Command("Exit", Command.BACK, 99);
 
 	/**
 	 * Stop playing music command.
 	 */
-	public Command stopMusicCmd = new Command("Stop music", Command.BACK, 11);
+	public Command stopMusicCmd = new Command("Stop music", Command.BACK, 41);
 
 	/**
 	 * Start playing music command.
 	 */
-	public Command startMusicCmd = new Command("Start music", Command.BACK, 11);
+	public Command startMusicCmd = new Command("Start music", Command.BACK, 41);
 
 	/**
 	 * Command event when skip intro was requested.
 	 */
-	public Command skipIntroCmd = new Command("Skip", Command.SCREEN, 10);
+	public Command skipIntroCmd = new Command("Skip", Command.SCREEN, 99);
 
 	/**
 	 * Element of UI for board display.
@@ -43,27 +43,27 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	/**
 	 * Request
 	 */
-	public Command beClientCmd = new Command("Connect to remote", Command.SCREEN, 1);
+	public Command beClientCmd = new Command("Connect to remote", Command.SCREEN, 11);
 
 	/**
 	 * Request hosting a local server command.
 	 */
-	public Command beServerCmd = new Command("Host game", Command.SCREEN, 1);
+	public Command beServerCmd = new Command("Host game", Command.SCREEN, 12);
 
 	/**
 	 * Request that user want to play white stones (possibly: too) command.
 	 */
-	public Command playWhiteCmd = new Command("Play white", Command.SCREEN, 1);
+	public Command playWhiteCmd = new Command("Play white", Command.SCREEN, 21);
 
 	/**
 	 * Request that user want to play black stones (possibly: too) command.
 	 */
-	public Command playBlackCmd = new Command("Play black", Command.SCREEN, 1);
+	public Command playBlackCmd = new Command("Play black", Command.SCREEN, 22);
 
 	/**
 	 * Help request command.
 	 */
-	public Command printHelpCmd = new Command("Print help", Command.HELP, 1);
+	public Command printHelpCmd = new Command("Print help", Command.SCREEN, 1);
 
 
 	/**
@@ -273,6 +273,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 			System.out.println(e);
 		}
 	}
+
 	/**
 	 * Handle key presses.
 	 */
