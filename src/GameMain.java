@@ -25,10 +25,19 @@ import javax.microedition.lcdui.CommandListener;
  */
 public class GameMain extends MIDlet implements CommandListener {
 
-
+	/**
+	 * Game display.
+	 */
 	private Display display;
+
+	/**
+	 * Main game controler.
+	 */
 	private Goban goban;
 
+	/**
+	 * Main game thread.
+	 */
 	private Thread thread;
 
 	/**
@@ -93,6 +102,10 @@ public class GameMain extends MIDlet implements CommandListener {
 			goban.playBlack();
 		} else if (c == goban.printHelpCmd) {
 			goban.printUIHelp();
+		} else if (c == goban.stopMusicCmd) {
+			goban.stopMusic();
+		} else if (c == goban.startMusicCmd) {
+			goban.startMusic();
 		}
 
 		goban.repaintUI();
