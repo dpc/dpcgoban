@@ -5,10 +5,25 @@ import javax.microedition.lcdui.Graphics;
 
 class Chat extends UIElementCommon {
 
+	/**
+	 * Chat internal bitmat that we draw on.
+	 */
 	Image chatImage = null;
 
+	/**
+	 * The font that will be used to draw messages.
+	 */
+	protected Font logFont;
+
+	/**
+	 * Ctor.
+	 */
 	public Chat(Parent parent) {
 		super(parent);
+
+		logFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
+
+//		logFont = Font.getDefaultFont();
 
 		chatImage = Image.createImage(
 			parent.getXSize(),
@@ -17,8 +32,11 @@ class Chat extends UIElementCommon {
 
 	}
 
+	/**
+	 * Append string to log.
+	 */
 	public void appendString(String str) {
-		Font f = Font.getDefaultFont();
+		Font f = logFont;
 		if (str.length() == 0) {
 			return;
 		}
@@ -32,9 +50,14 @@ class Chat extends UIElementCommon {
 		drawString("??? ASSERT ERROR !!!");
 	}
 
-	public void drawString(String str) {
+	/**
+	 * Draw one line of text from str.
+	 *
+	 * str should not exceed chat width or will not fit.
+	 */
+	protected void drawString(String str) {
 		Graphics g = chatImage.getGraphics();
-		Font f = Font.getDefaultFont();
+		Font f = logFont;
 
 		g.copyArea(
 			0, f.getHeight(),
