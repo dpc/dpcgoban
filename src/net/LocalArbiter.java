@@ -9,9 +9,17 @@ class LocalArbiter implements Arbiter {
 	GameController blackController;
 	GameController whiteController;
 
+	LocalArbiterListener listener;
+
 	Vector connectedControllers = new Vector();
 
 	public LocalArbiter() {
+		try {
+		listener = LocalArbiterListenerFactory.Create(this, LocalArbiterListener.BLUETOOTH);
+		} catch (InvalidArgumentException e) {
+			//XXX: TODO: what to do?
+		}
+		listener.start();
 	}
 
 	public void connect(GameController ngc) {
@@ -40,10 +48,10 @@ class LocalArbiter implements Arbiter {
 	public void handleColor(GameController gc, int color) {
 		switch (color) {
 			case COLOR_WHITE:
-				whiteController= gc;
+				whiteController = gc;
 				break;
 			case COLOR_BLACK:
-				blackController= gc;
+				blackController = gc;
 				break;
 		}
 	}
