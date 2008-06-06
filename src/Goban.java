@@ -8,7 +8,7 @@ import javax.microedition.media.*;
 import javax.microedition.media.control.*;
 
 /**
- * Game board, timers and everything used to play go.
+ * Game board, statView and everything used to play go.
  *
  * This is main controlling class. It has its own thread
  * to control game, networking etc.
@@ -38,7 +38,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	/**
 	 * Element of UI for board display.
 	 */
-	public BoardView boardui = new BoardView(this);
+	public BoardView boardView = new BoardView(this);
 
 	/**
 	 * Request
@@ -65,21 +65,20 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	 */
 	public Command printHelpCmd = new Command("Print help", Command.SCREEN, 1);
 
-
 	/**
 	 * Music player.
 	 */
 	Player player;
 
 	/**
-	 * Element of UI for timers display and such.
+	 * Element of UI for statView display and such.
 	 */
-	public Timers timers = new Timers(this);
+	public StatView statView = new StatView(this);
 
 	/**
 	 * Element of UI for chat and logs.
 	 */
-	public Chat chat = new Chat(this);
+	public LogView logView = new LogView(this);
 
 	/**
 	 * Board representation.
@@ -123,9 +122,9 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	 * Ctor.
 	 */
 	public Goban() {
-		chat.appendString("Welcome in DPC Goban!");
-		chat.appendString("Connect to or host a game to start.");
-		chat.appendString("---");
+		logView.appendString("Welcome in DPC Goban!");
+		logView.appendString("Connect to or host a game to start.");
+		logView.appendString("---");
 
 		addCommand(skipIntroCmd);
 
@@ -134,12 +133,12 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 		} catch (Exception e) {
 			/* fails on problems with textures etc. */
 			skipIntro();
-			chat.appendString("Couldn't start intro. Sorry.");
+			logView.appendString("Couldn't start intro. Sorry.");
 		}
 		addCommand(stopMusicCmd);
 		startMusic();
 
-		board = new Board(boardui);
+		board = new Board(boardView);
 	}
 
 	/**
@@ -148,9 +147,16 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	 * incoming players.
 	 */
 	public void beServer() {
-		Arbiter arbiter = new LocalArbiter();
-		gameController = new LocalGameController(board);
-		gameController.connect(arbiter);
+		try {
+			Arbiter arbiter = new LocalArbiter();
+			gameController = new LocalGameController(board);
+			gameController.connect(arbiter);
+		} catch (LocalArbiter.CreationError e) {
+			logView.appendString(
+				"Couldn't create server. Reason: `"
+				+ e.getMessage() + "'"
+				);
+		}
 	}
 
 	/**
@@ -158,6 +164,18 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	 * and play game there.
 	 */
 	public void beClient() {
+		try {
+			Arbiter arbiter = new RemoteArbiter(
+				RemoteArbiterTransport.BLUETOOTH
+				);
+			gameController = new LocalGameController(board);
+			gameController.connect(arbiter);
+		} catch (RemoteArbiter.CreationError e) {
+			logView.appendString(
+				"Couldn't connect to server. Reason: `"
+				+ e.getMessage() + "'"
+				);
+		}
 	}
 
 	/**
@@ -165,7 +183,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	 */
 	public void playBlack() {
 	}
-	
+
 	/**
 	 * Request from current server giving user control over white stones.
 	 */
@@ -176,9 +194,9 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	 * Print basic user help.
 	 */
 	public void printUIHelp() {
-		chat.appendString("1, 3 - zoom in/out");
-		chat.appendString("7, 9 - toggle side, chat bars");
-		chat.appendString("arrows - move; action - place stone");
+		logView.appendString("1, 3 - zoom in/out");
+		logView.appendString("7, 9 - toggle side, log bars");
+		logView.appendString("arrows - move; action - place stone");
 	}
 
 	/**
@@ -194,9 +212,9 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 			return;
 		}
 
-		timers.paint(g);
-		boardui.paint(g);
-		chat.paint(g);
+		statView.paint(g);
+		boardView.paint(g);
+		logView.paint(g);
 	}
 
 	/**
@@ -329,9 +347,9 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	 * Mark whole UI to be repainted.
 	 */
 	public void repaintUI() {
-		timers.markDirty();
-		boardui.markDirty();
-		chat.markDirty();
+		statView.markDirty();
+		boardView.markDirty();
+		logView.markDirty();
 	}
 
 	/**

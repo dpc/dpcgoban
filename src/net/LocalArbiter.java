@@ -1,11 +1,16 @@
 import java.util.Vector;
 
 /**
- * Local interface to arbiter.
+ * Local implementation of arbiter.
  *
  * This class is actual arbiter implementation.
  */
 class LocalArbiter implements Arbiter {
+	public class CreationError extends Exception {
+		public CreationError(String s) {
+			super(s);
+		}
+	}
 	GameController blackController;
 	GameController whiteController;
 
@@ -13,17 +18,22 @@ class LocalArbiter implements Arbiter {
 
 	Vector connectedControllers = new Vector();
 
-	public LocalArbiter() {
+	public LocalArbiter() throws CreationError {
 		try {
-		listener = LocalArbiterListenerFactory.Create(this, LocalArbiterListener.BLUETOOTH);
+			listener = LocalArbiterListenerFactory.Create(
+				this, LocalArbiterListener.BLUETOOTH
+				);
 		} catch (InvalidArgumentException e) {
-			//XXX: TODO: what to do?
+			throw new CreationError(e.getMessage());
 		}
 		listener.start();
 	}
 
 	public void connect(GameController ngc) {
+		appendToControllersList(ngc);
+	}
 
+	protected void appendToControllersList(GameController ngc) {
 		for (int i = 0; i < connectedControllers.size(); ++i) {
 			GameController gc = (GameController)(
 				connectedControllers.elementAt(i)
@@ -33,7 +43,6 @@ class LocalArbiter implements Arbiter {
 				return;
 			}
 		}
-
 		// no nulls, just grow
 		connectedControllers.addElement(ngc);
 	}

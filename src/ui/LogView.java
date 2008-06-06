@@ -3,7 +3,7 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.Graphics;
 
-class Chat extends UIElementCommon {
+class LogView extends UIElementCommon {
 
 	/**
 	 * Chat internal bitmat that we draw on.
@@ -18,7 +18,7 @@ class Chat extends UIElementCommon {
 	/**
 	 * Ctor.
 	 */
-	public Chat(Parent parent) {
+	public LogView(Parent parent) {
 		super(parent);
 
 		logFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
