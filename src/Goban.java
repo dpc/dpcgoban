@@ -13,7 +13,8 @@ import javax.microedition.media.control.*;
  * This is main controlling class. It has its own thread
  * to control game, networking etc.
  */
-public class Goban extends Canvas implements Runnable, UIElement.Parent {
+public class Goban extends Canvas
+	implements Runnable, UIElement.Parent, LocalArbiter.Parent {
 
 	/**
 	 * Command event when application close was requested.
@@ -148,7 +149,7 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 	 */
 	public void beServer() {
 		try {
-			Arbiter arbiter = new LocalArbiter();
+			Arbiter arbiter = new LocalArbiter(this);
 			gameController = new LocalGameController(board);
 			gameController.connect(arbiter);
 		} catch (LocalArbiter.CreationError e) {
@@ -157,6 +158,10 @@ public class Goban extends Canvas implements Runnable, UIElement.Parent {
 				+ e.getMessage() + "'"
 				);
 		}
+	}
+
+	public void localArbiterInitFinishedCallback() {
+		repaintUI();
 	}
 
 	/**

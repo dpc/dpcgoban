@@ -10,13 +10,7 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
 class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
-	public class CreationException extends Exception {
-		public CreationException(String s) {
-			super("could not create LocalArbiterBluetoothListener: '" + s + "'");
-		}
-	}
 
-	private final String MAGIC_UUID = new String("26b4d249fb8844d5a756fc265a11f7a3");
 
 	private boolean closed = false;
 
@@ -25,26 +19,8 @@ class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 
 	Thread thread = null;
 
-	public LocalArbiterBluetoothListener(LocalArbiter parent) throws CreationException {
+	public LocalArbiterBluetoothListener(LocalArbiter parent) {
 		this.parent = parent;
-		LocalDevice local = null;
-
-		try {
-			local = LocalDevice.getLocalDevice();
-
-			if (!local.setDiscoverable(DiscoveryAgent.GIAC)) {
-				throw new CreationException("couldn't setDiscoverable");
-			}
-
-			notifier =
-				(StreamConnectionNotifier) Connector.open("btspp://localhost:"
-					+ MAGIC_UUID);
-
-		} catch (BluetoothStateException e) {
-			throw new CreationException("Bluetooth Error : `" + e.getMessage() + "'");
-		} catch (IOException e) {
-			throw new CreationException("IOError Error : `" + e.getMessage() + "'");
-		}
 
 		thread = new Thread(this);
 	}
@@ -53,12 +29,34 @@ class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 		thread.start();
 		closed = false;
 	}
-
+	
 	public void stop() {
 		closed = true;
 		try {
 			thread.join();
 		} catch (InterruptedException ie) {}
+	}
+
+	public void initListener() {
+		LocalDevice local = null;
+
+		try {
+			local = LocalDevice.getLocalDevice();
+
+			if (!local.setDiscoverable(DiscoveryAgent.GIAC)) {
+				throw new IOException("couldn't setDiscoverable");
+			}
+
+			notifier = (StreamConnectionNotifier) Connector.open(
+					"btspp://localhost:" + MAGIC_UUID
+					);
+
+		} catch (BluetoothStateException e) {
+			closed = true;
+		} catch (IOException e) {
+			closed = true;
+		}
+		parent.listenerInitFinishedCallback();
 	}
 
 	public int type() {
@@ -67,6 +65,7 @@ class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 
 	public void run() {
 		try {
+			initListener();
 			while (!closed) {
 				StreamConnection conn = notifier.acceptAndOpen();
 			}

@@ -11,6 +11,13 @@ class LocalArbiter implements Arbiter {
 			super(s);
 		}
 	}
+
+	public interface Parent {
+		public void localArbiterInitFinishedCallback();
+	}
+
+	protected Parent parent;
+
 	GameController blackController;
 	GameController whiteController;
 
@@ -18,7 +25,8 @@ class LocalArbiter implements Arbiter {
 
 	Vector connectedControllers = new Vector();
 
-	public LocalArbiter() throws CreationError {
+	public LocalArbiter(Parent parent) throws CreationError {
+		this.parent = parent;
 		try {
 			listener = LocalArbiterListenerFactory.Create(
 				this, LocalArbiterListener.BLUETOOTH
@@ -28,6 +36,11 @@ class LocalArbiter implements Arbiter {
 		}
 		listener.start();
 	}
+
+	public void listenerInitFinishedCallback() {
+		parent.localArbiterInitFinishedCallback();
+	}
+
 
 	public void connect(GameController ngc) {
 		appendToControllersList(ngc);
