@@ -62,8 +62,8 @@
 
 		<!-- Preverify. -->
 
-		<!-- wtkpreverify jarfile="dpcgoban.jar"
-		jadfile="dpcgoban.jad"/-->
+		<wtkpreverify jarfile="dpcgoban.jar"
+			jadfile="dpcgoban.jad"/>
 
 		<!-- Convert the JAR file into a MIDP for PalmOS PRC file. -->
 
