@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<project name="dpcgoban" default="build" basedir=".">
+
+	<!-- Define the Wireless Toolkit home directory. Needed by the tasks. -->
+
+	<property name="wtk.home" value="/opt/wtk" />
+	<property name="wtk.cldc.version" value="1.1" />
+	<property name="wtk.midp.version" value="2.0" />
+	<property name="wtk.mmapi.enabled" value="true" />
+	<property name="wtk.bluetooth.enabled" value="true" />
+	<property name="wtk.java3d.enabled" value="true" />
+
+	<!-- Define the tasks. -->
+
+	<taskdef resource="antenna.properties"
+		classpath="antenna-bin-1.1.0-beta.jar" />
+
+	<target name="build">
+
+		<!-- Create a JAD file. -->
+
+		<wtkjad jadfile="dpcgoban.jad"
+			jarfile="dpcgoban.jar"
+			name="Hello"
+			vendor="Dawid Ciężarkiewicz"
+			version="1.0.0">
+
+			<midlet name="dpcgoban" class="GameMain"/>
+			<attribute name="ZOO" value="GAR" />
+			<attribute name="FOO" value="BAR" />
+			<attribute name="A" value="1" />
+			<attribute name="URL" value="http://google.com" />
+		</wtkjad>
+
+		<delete dir="classes"/>
+		<mkdir dir="classes"/>
+
+		<!-- Compile everything, but don't preverify (yet). -->
+
+		<wtkbuild srcdir="src"
+			destdir="classes"
+			preverify="false"/>
+
+		<!-- Package everything. Most of the necessary information is
+		contained in the JAD file. Also preverify the result this
+		time. To obfuscate everything, set the corresponding
+		parameter to "true" (requires RetroGuard or ProGuard). The
+		version parameter increments the MIDlet-Version by one. -->
+
+		<wtkpackage jarfile="dpcgoban.jar"
+			jadfile="dpcgoban.jad"
+			obfuscate="false"
+			preverify="false">
+
+			<!-- Package our newly compiled classes. -->
+
+			<fileset dir="classes"/>
+			<exclude_from_manifest name="FOO"/>
+			<exclude_from_manifest list="A,FOO,URL"/>
+		</wtkpackage>
+
+		<!-- Preverify. -->
+
+		<!-- wtkpreverify jarfile="dpcgoban.jar"
+		jadfile="dpcgoban.jad"/-->
+
+		<!-- Convert the JAR file into a MIDP for PalmOS PRC file. -->
+
+		<!--wtkmakeprc jadfile="dpcgoban.jad"
+		jarfile="dpcgoban.jar"
+		prcfile="dpcgoban.prc"/-->
+
+		<wtkrun jadfile="dpcgoban.jad" device="DefaultColorPhone" wait="true"/>
+
+	</target>
+
+</project>
