@@ -1,8 +1,8 @@
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 
-class Timers extends UIElementCommon {
-	public Timers(Parent parent) {
+class StatView extends UIElementCommon {
+	public StatView(Parent parent) {
 		super(parent);
 	}
 
