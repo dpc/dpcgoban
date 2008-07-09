@@ -1,3 +1,9 @@
+import javax.microedition.io.StreamConnection;
+import java.lang.Thread;
+import javax.bluetooth.*;
+import java.io.*;
+import javax.microedition.io.Connector;
+
 /**
  * Remote arbiter from local perspective.
  *
@@ -8,6 +14,8 @@ class RemoteArbiterBluetoothTransport
 	implements RemoteArbiterTransport, Runnable {
 	Parent parent;
 	StreamConnection streamConnection;
+	Thread thread;
+	DiscoveryAgent discoveryAgent;
 
 	public RemoteArbiterBluetoothTransport(Parent parent) {
 		this.parent = parent;
@@ -20,20 +28,24 @@ class RemoteArbiterBluetoothTransport
 		try {
 			// Select the service. Indicate no
 			// authentication or encryption is required.
-			String connectionURL = 
-				discoveryAgent.selectService(CommonBluetooth.MAGIC_UUID, 
-						ServiceRecord.NOAUTHENTICATE_NOENCRYPT, 
-						false);
+			LocalDevice localDevice = LocalDevice.getLocalDevice();
+			discoveryAgent = localDevice.getDiscoveryAgent();
+			String connectionURL =
+				discoveryAgent.selectService(
+						new UUID(CommonBluetooth.MAGIC_UUID, false),
+						ServiceRecord.NOAUTHENTICATE_NOENCRYPT,
+						false
+						);
 
 			StreamConnection streamConnection
 				= (StreamConnection) Connector.open(connectionURL);
 
 		} catch (BluetoothStateException bse) {
-			System.out.println("BTMIDlet.btConnect2, 
-					exception " + bse);
+			System.out.println("BTMIDlet.btConnect2, " +
+					"exception " + bse);
 		} catch (IOException ioe) {
-			System.out.println("BTMIDlet.btConnect2, 
-					exception " + ioe);
+			System.out.println("BTMIDlet.btConnect2, " +
+					"exception " + ioe);
 		}
 	}
 
@@ -41,7 +53,8 @@ class RemoteArbiterBluetoothTransport
 		thread.start();
 		closed = false;
 	}
-		public void stop() {
+
+	public void stop() {
 		closed = true;
 		try {
 			thread.join();
@@ -50,9 +63,13 @@ class RemoteArbiterBluetoothTransport
 
 	public void run() {
 		try {
-			initListener();
+			initBluetooth();
+			DataInputStream datain =
+				streamConnection.openDataInputStream();
 			while (!closed) {
-				StreamConnection conn = notifier.acceptAndOpen();
+				// use the connection
+				byte buf[] = new byte[100];
+				datain.read(buf);
 			}
 		} catch (IOException e) {
 			//XXX:TODO: ?
@@ -60,15 +77,21 @@ class RemoteArbiterBluetoothTransport
 	}
 
 	public void finishBluetooth() {
-		streamConnection.close();
+		try {
+			streamConnection.close();
+		} catch (IOException e) {
+			//XXX:TODO: ?
+		}
 	}
 
 	public void sendMsg(String s) {
-
-			DataOutputStream dataout = 
-				streamConnection.openDataOutputStream();
-			dataout.writeUTF(s);
-
+		try {
+		DataOutputStream dataout =
+			streamConnection.openDataOutputStream();
+		dataout.writeUTF(s);
+		} catch (IOException e) {
+			//XXX:TODO: ?
+		}
 	}
 
 	public int type() {

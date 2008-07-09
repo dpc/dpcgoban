@@ -48,7 +48,7 @@ class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 			}
 
 			notifier = (StreamConnectionNotifier) Connector.open(
-					"btspp://localhost:" + MAGIC_UUID
+					"btspp://localhost:" + CommonBluetooth.MAGIC_UUID
 					);
 
 		} catch (BluetoothStateException e) {
