@@ -19,39 +19,15 @@ class RemoteArbiterBluetoothTransport
 
 	public RemoteArbiterBluetoothTransport(Parent parent) {
 		this.parent = parent;
+		parent.handleTransportInfo(this, "starting thread...");
 		thread = new Thread(this);
 	}
 
 	private boolean closed;
 
-	public void initBluetooth() {
-		try {
-			// Select the service. Indicate no
-			// authentication or encryption is required.
-			LocalDevice localDevice = LocalDevice.getLocalDevice();
-			discoveryAgent = localDevice.getDiscoveryAgent();
-			String connectionURL =
-				discoveryAgent.selectService(
-						new UUID(CommonBluetooth.MAGIC_UUID, false),
-						ServiceRecord.NOAUTHENTICATE_NOENCRYPT,
-						false
-						);
-
-			StreamConnection streamConnection
-				= (StreamConnection) Connector.open(connectionURL);
-
-		} catch (BluetoothStateException bse) {
-			System.out.println("BTMIDlet.btConnect2, " +
-					"exception " + bse);
-		} catch (IOException ioe) {
-			System.out.println("BTMIDlet.btConnect2, " +
-					"exception " + ioe);
-		}
-	}
-
 	public void start() {
-		thread.start();
 		closed = false;
+		thread.start();
 	}
 
 	public void stop() {
@@ -64,34 +40,77 @@ class RemoteArbiterBluetoothTransport
 	public void run() {
 		try {
 			initBluetooth();
+			parent.handleTransportConnected(
+					this,
+					"unknown server"
+					);
 			DataInputStream datain =
 				streamConnection.openDataInputStream();
 			while (!closed) {
 				// use the connection
 				byte buf[] = new byte[100];
 				datain.read(buf);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {}
 			}
+			finishBluetooth();
 		} catch (IOException e) {
-			//XXX:TODO: ?
+			parent.handleTransportDisconnected(
+					this,
+					e.getMessage()
+					);
+			return;
+		}
+		parent.handleTransportDisconnected(
+					this,
+					"closed normally"
+					);
+	}
+
+	protected void initBluetooth()
+		throws IOException
+	{
+		try {
+			// Select the service. Indicate no
+			// authentication or encryption is required.
+			LocalDevice localDevice = LocalDevice.getLocalDevice();
+			discoveryAgent = localDevice.getDiscoveryAgent();
+			parent.handleTransportInfo(this, "selecting service...");
+			String connectionURL =
+				discoveryAgent.selectService(
+						new UUID(CommonBluetooth.MAGIC_UUID, false),
+						ServiceRecord.NOAUTHENTICATE_NOENCRYPT,
+						false
+						);
+
+			parent.handleTransportInfo(this, "opening connection...");
+			StreamConnection streamConnection
+				= (StreamConnection) Connector.open(
+						connectionURL,
+						Connector.READ_WRITE,
+						true
+						);
+
+		} catch (BluetoothStateException bse) {
+			throw new IOException(
+					"BTMIDlet.btConnect2:" + bse
+					);
 		}
 	}
 
-	public void finishBluetooth() {
-		try {
-			streamConnection.close();
-		} catch (IOException e) {
-			//XXX:TODO: ?
-		}
+	protected void finishBluetooth()
+		throws IOException
+	{
+		streamConnection.close();
 	}
 
-	public void sendMsg(String s) {
-		try {
+	public void sendMsg(String s)
+		throws IOException
+	{
 		DataOutputStream dataout =
 			streamConnection.openDataOutputStream();
 		dataout.writeUTF(s);
-		} catch (IOException e) {
-			//XXX:TODO: ?
-		}
 	}
 
 	public int type() {

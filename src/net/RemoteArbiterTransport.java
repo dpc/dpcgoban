@@ -1,3 +1,5 @@
+import java.io.*;
+
 /**
  * Transport used to communicate with remote arbiter.
  */
@@ -13,8 +15,26 @@ interface RemoteArbiterTransport {
 		 * Called on each incoming message.
 		 */
 		void receiveMsg(String s);
+
+		/**
+		 * Called to notify parent about disconnect exception.
+		 *
+		 * Problem with connecting will be singalized by this
+		 * one too.
+		 */
+		void handleTransportDisconnected(RemoteArbiterTransport t, String s);
+
+		/**
+		 * Called after connection was estabilished.
+		 */
+		void handleTransportConnected(RemoteArbiterTransport t, String s);
+
+		void handleTransportInfo(RemoteArbiterTransport t, String s);
 	}
 
-	void sendMsg(String msg);
+	void sendMsg(String msg) throws IOException;
 	int type();
+
+	public void start();
+	public void stop();
 }

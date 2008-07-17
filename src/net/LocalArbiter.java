@@ -5,15 +5,14 @@ import java.util.Vector;
  *
  * This class is actual arbiter implementation.
  */
-class LocalArbiter implements Arbiter {
+class LocalArbiter
+	implements Arbiter,
+			   LocalArbiterListener.Parent
+{
 	public class CreationError extends Exception {
 		public CreationError(String s) {
 			super(s);
 		}
-	}
-
-	public interface Parent {
-		public void localArbiterInitFinishedCallback();
 	}
 
 	protected Parent parent;
@@ -37,10 +36,10 @@ class LocalArbiter implements Arbiter {
 		listener.start();
 	}
 
-	public void listenerInitFinishedCallback() {
-		parent.localArbiterInitFinishedCallback();
+	public void handleListenerUp() {
+		parent.handleArbiterInitFinished();
+		parent.handleArbiterMsg("server started");
 	}
-
 
 	public void connect(GameController ngc) {
 		appendToControllersList(ngc);
@@ -92,6 +91,7 @@ class LocalArbiter implements Arbiter {
 				break;
 		}
 	}
+
 	public void moveRequest(int x, int y) {
 		for (int i = 0; i < connectedControllers.size(); ++i) {
 			GameController gc = (GameController)(
@@ -101,5 +101,22 @@ class LocalArbiter implements Arbiter {
 				gc.placeStone(x, y, Board.COLOR_WHITE);
 			}
 		}
+	}
+
+	public void handleListenerInfo(LocalArbiterListener l, String msg) {
+	}
+
+	public void handleListenerUp(LocalArbiterListener l) {
+		parent.handleArbiterInitFinished();
+	}
+
+	public void handleListenerDown(LocalArbiterListener l, String msg) {
+	}
+
+	public void handleControllerConnected(RemoteController c) {
+		parent.handleArbiterMsg("new client connection");
+	}
+
+	public void handleControllerDisconnected(RemoteController c) {
 	}
 }

@@ -14,7 +14,7 @@ import javax.microedition.media.control.*;
  * to control game, networking etc.
  */
 public class Goban extends Canvas
-	implements Runnable, UIElement.Parent, LocalArbiter.Parent {
+	implements Runnable, UIElement.Parent, Arbiter.Parent {
 
 	/**
 	 * Command event when application close was requested.
@@ -160,7 +160,7 @@ public class Goban extends Canvas
 		}
 	}
 
-	public void localArbiterInitFinishedCallback() {
+	public void handleArbiterInitFinished() {
 		repaintUI();
 	}
 
@@ -171,8 +171,9 @@ public class Goban extends Canvas
 	public void beClient() {
 		try {
 			Arbiter arbiter = new RemoteArbiter(
-				RemoteArbiterTransport.BLUETOOTH
-				);
+					this,
+					RemoteArbiterTransport.BLUETOOTH
+					);
 			gameController = new LocalGameController(board);
 			gameController.connect(arbiter);
 		} catch (RemoteArbiter.CreationError e) {
@@ -389,5 +390,12 @@ public class Goban extends Canvas
 	 */
 	public int getYSize() {
 		return getHeight();
+	}
+
+	/**
+	 * Handle msg requests from RemoteArbiter.
+	 */
+	public void handleArbiterMsg(String s) {
+		logView.appendString(s);
 	}
 }

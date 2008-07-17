@@ -1,3 +1,5 @@
+import java.io.*;
+
 /**
  * Remote arbiter.
  */
@@ -10,9 +12,14 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 		}
 	}
 
-	public RemoteArbiter(int type) throws CreationError {
+	public Parent parent;
+
+	public RemoteArbiter(Parent parent, int type) throws CreationError {
+		this.parent = parent;
+
 		try {
 			transport = RemoteArbiterTransportFactory.Create(this, type);
+			transport.start();
 		} catch (InvalidArgumentException e) {
 			throw new CreationError(e.getMessage());
 		}
@@ -30,6 +37,29 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 	}
 
 	public void receiveMsg(String s) {
+	}
+
+	public void handleTransportConnected(RemoteArbiterTransport t, String s) {
+		parent.handleArbiterInitFinished();
+		parent.handleArbiterMsg("Connected to: " + s);
+		try {
+			t.sendMsg("INIT");
+		} catch (IOException e) {
+			parent.handleArbiterMsg("IO ERROR");
+		}
+	}
+
+	public void handleTransportDisconnected(
+			RemoteArbiterTransport t,
+			String s
+			) {
+		parent.handleArbiterMsg(s);
+		t.stop();
+		t = null;
+	}
+
+	public void handleTransportInfo(RemoteArbiterTransport t, String s) {
+		parent.handleArbiterMsg("Info: " + s);
 	}
 }
 

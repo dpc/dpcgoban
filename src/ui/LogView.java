@@ -21,21 +21,20 @@ class LogView extends UIElementCommon {
 	public LogView(Parent parent) {
 		super(parent);
 
-		logFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
-
-//		logFont = Font.getDefaultFont();
+		logFont = Font.getFont(
+				Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL
+				);
 
 		chatImage = Image.createImage(
 			parent.getXSize(),
 			parent.getYSize() - parent.getYDiv()
 			);
-
 	}
 
 	/**
 	 * Append string to log.
 	 */
-	public void appendString(String str) {
+	public synchronized void appendString(String str) {
 		Font f = logFont;
 		if (str.length() == 0) {
 			return;

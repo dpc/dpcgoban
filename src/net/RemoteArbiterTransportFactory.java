@@ -10,7 +10,8 @@ class RemoteArbiterTransportFactory {
 		throws InvalidArgumentException {
 		switch (type) {
 			case RemoteArbiterTransport.BLUETOOTH:
-				return new RemoteArbiterBluetoothTransport(parent);
+					return new RemoteArbiterBluetoothTransport(parent);
+
 			default:
 				throw new InvalidArgumentException(
 					"invalid/unimplemented connector type"

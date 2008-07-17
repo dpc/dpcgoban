@@ -11,7 +11,6 @@ import javax.microedition.io.StreamConnection;
 
 class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 
-
 	private boolean closed = false;
 
 	StreamConnectionNotifier notifier;
@@ -29,7 +28,7 @@ class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 		thread.start();
 		closed = false;
 	}
-	
+
 	public void stop() {
 		closed = true;
 		try {
@@ -37,7 +36,9 @@ class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 		} catch (InterruptedException ie) {}
 	}
 
-	public void initListener() {
+	public void initListener()
+	throws IOException
+	{
 		LocalDevice local = null;
 
 		try {
@@ -54,9 +55,8 @@ class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 		} catch (BluetoothStateException e) {
 			closed = true;
 		} catch (IOException e) {
-			closed = true;
 		}
-		parent.listenerInitFinishedCallback();
+		parent.handleListenerUp();
 	}
 
 	public int type() {
@@ -65,12 +65,27 @@ class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 
 	public void run() {
 		try {
+			parent.handleListenerInfo(
+					this,
+					"starting up server socket..."
+					);
 			initListener();
+			parent.handleListenerUp(this);
 			while (!closed) {
 				StreamConnection conn = notifier.acceptAndOpen();
+				parent.handleControllerConnected(new RemoteController(conn));
 			}
 		} catch (IOException e) {
-			//XXX:TODO: ?
+			closed = true;
+			parent.handleListenerDown(
+					this,
+					e.getMessage()
+					);
+			return;
 		}
+		parent.handleListenerDown(
+				this,
+				"finished normally"
+				);
 	}
 }
