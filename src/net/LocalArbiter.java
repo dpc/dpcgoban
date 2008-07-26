@@ -113,10 +113,11 @@ class LocalArbiter
 	public void handleListenerDown(LocalArbiterListener l, String msg) {
 	}
 
-	public void handleControllerConnected(RemoteController c) {
+	public void handleControllerConnected(RemoteGameController c) {
 		parent.handleArbiterMsg("new client connection");
 	}
 
-	public void handleControllerDisconnected(RemoteController c) {
+	public void handleControllerDisconnected(RemoteGameController c) {
+		parent.handleArbiterMsg("client disconnected connection");
 	}
 }

@@ -21,5 +21,10 @@ class LocalGameController implements GameController {
 	public void placeStone(int x, int y, int c) {
 		board.placeStone(x, y, c);
 	}
+
+	public String name() {
+		return "local";
+	}
+
 }
 

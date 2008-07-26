@@ -16,12 +16,12 @@ interface LocalArbiterListener {
 		 * Problem with connecting will be singalized by this
 		 * one too.
 		 */
-		void handleControllerDisconnected(RemoteController c);
+		void handleControllerDisconnected(RemoteGameController c);
 
 		/**
 		 * Called after connection was estabilished.
 		 */
-		void handleControllerConnected(RemoteController c);
+		void handleControllerConnected(RemoteGameController c);
 
 		void handleListenerUp(LocalArbiterListener l);
 		void handleListenerDown(LocalArbiterListener l, String s);

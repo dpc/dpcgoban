@@ -44,7 +44,10 @@ public class Goban extends Canvas
 	/**
 	 * Request
 	 */
-	public Command beClientCmd = new Command("Connect to remote", Command.SCREEN, 11);
+	public Command beClientCmd = new Command(
+			"Connect to remote",
+			Command.SCREEN, 11
+			);
 
 	/**
 	 * Request hosting a local server command.
