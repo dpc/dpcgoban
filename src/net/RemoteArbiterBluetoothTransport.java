@@ -11,7 +11,9 @@ import javax.microedition.io.Connector;
  * real LocalArbiter on the other side of the connection.
  */
 class RemoteArbiterBluetoothTransport
+	extends CommonTransportHandler
 	implements RemoteArbiterTransport, Runnable {
+
 	Parent parent;
 	StreamConnection streamConnection;
 	Thread thread;
@@ -44,12 +46,11 @@ class RemoteArbiterBluetoothTransport
 					this,
 					"unknown server"
 					);
-			DataInputStream datain =
+			in =
 				streamConnection.openDataInputStream();
 			while (!closed) {
 				// use the connection
-				byte buf[] = new byte[100];
-				datain.read(buf);
+				receive();
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {}
@@ -85,12 +86,15 @@ class RemoteArbiterBluetoothTransport
 						);
 
 			parent.handleTransportInfo(this, "opening connection...");
-			StreamConnection streamConnection
+			StreamConnection stream
 				= (StreamConnection) Connector.open(
 						connectionURL,
 						Connector.READ_WRITE,
 						true
 						);
+
+		in = stream.openDataInputStream();
+		out = stream.openDataOutputStream();
 
 		} catch (BluetoothStateException bse) {
 			throw new IOException(
@@ -102,19 +106,24 @@ class RemoteArbiterBluetoothTransport
 	protected void finishBluetooth()
 		throws IOException
 	{
-		streamConnection.close();
 	}
 
 	public void sendMsg(String s)
 		throws IOException
 	{
-		DataOutputStream dataout =
-			streamConnection.openDataOutputStream();
-		dataout.writeUTF(s);
 	}
 
 	public int type() {
 		return BLUETOOTH;
+	}
+
+	public void protocolFailure(String str) {
+		//TODO: implement me
+		stop();
+	}
+
+	public void handleIncomingCommand(String cmd) {
+		//TODO: implement me
 	}
 }
 

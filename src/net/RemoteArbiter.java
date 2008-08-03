@@ -2,6 +2,8 @@ import java.io.*;
 
 /**
  * Remote arbiter.
+ *
+ * Remote arbiter from the point of view of LocalGameController.
  */
 class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 	RemoteArbiterTransport transport;
@@ -36,7 +38,13 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 	public void moveRequest(int x, int y) {
 	}
 
+	/**
+	 * Analyze the message that comes from transport.
+	 *
+	 * Will be called from different thread.
+	 */
 	public void receiveMsg(String s) {
+
 	}
 
 	public void handleTransportConnected(RemoteArbiterTransport t, String s) {

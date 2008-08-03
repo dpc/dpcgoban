@@ -14,7 +14,7 @@ class LocalArbiterPoller
 	static private LocalArbiterPoller instance;
 	protected Thread thread;
 
-	protected Vector remoteGameControllers = new Vector();
+	protected Vector remoteGameControllerTransports = new Vector();
 	protected boolean finished = false;
 
 	interface Parent {
@@ -45,26 +45,28 @@ class LocalArbiterPoller
 	/**
 	 * Register new GameController in poller instance.
 	 */
-	public static void RegisterNewRemoteGameController(
+	public static void RegisterNewRemoteGameControllerTransport(
 			Parent parent,
-			RemoteGameController gc
+			RemoteGameControllerTransport gct
 			) {
 		MakeSureInstanceReady(parent);
-		instance.registerNewRemoteGameController(gc);
+		instance.registerNewRemoteGameControllerTransport(gct);
 	}
 
 	/**
 	 * Register new GameController in poller.
 	 */
-	protected void registerNewRemoteGameController(RemoteGameController gc) {
-		synchronized (remoteGameControllers) {
-			for (int i = 0; i < remoteGameControllers.size(); ++i) {
-				if (remoteGameControllers.elementAt(i) == null) {
-					remoteGameControllers.setElementAt(gc, i);
+	protected void registerNewRemoteGameControllerTransport(
+			RemoteGameControllerTransport gct
+			) {
+		synchronized (remoteGameControllerTransports) {
+			for (int i = 0; i < remoteGameControllerTransports.size(); ++i) {
+				if (remoteGameControllerTransports.elementAt(i) == null) {
+					remoteGameControllerTransports.setElementAt(gct, i);
 					return;
 				}
 			}
-			remoteGameControllers.addElement(gc);
+			remoteGameControllerTransports.addElement(gct);
 		}
 	}
 
@@ -111,17 +113,18 @@ class LocalArbiterPoller
 	 * Poll all the registered objects.
 	 */
 	protected void loopThroghGameControllers() {
-		synchronized (remoteGameControllers) {
-			for (int i = 0; i < remoteGameControllers.size(); ++i) {
-				if (remoteGameControllers.elementAt(i) != null) {
-					RemoteGameController gc = (RemoteGameController) 
-						remoteGameControllers.elementAt(i);
+		synchronized (remoteGameControllerTransports) {
+			for (int i = 0; i < remoteGameControllerTransports.size(); ++i) {
+				if (remoteGameControllerTransports.elementAt(i) != null) {
+					RemoteGameControllerTransport gc =
+						(RemoteGameControllerTransport)
+						remoteGameControllerTransports.elementAt(i);
 					try {
 						gc.poll();
 					} catch (IOException e) {
 						// TODO: some message?
 						// TODO: unregister anywere?
-						remoteGameControllers.setElementAt(null, i);
+						remoteGameControllerTransports.setElementAt(null, i);
 					}
 				}
 			}
