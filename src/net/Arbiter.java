@@ -5,8 +5,8 @@ interface Arbiter {
 	}
 	final static int COLOR_BLACK = 0;
 	final static int COLOR_WHITE = 1;
-	public void connect(GameController gc);
-	public void disconnect(GameController gc);
+	public void connected(GameController gc);
+	public void disconnected(GameController gc);
 	public void handleColor(GameController gc, int color);
 	public void unhandleColor(GameController gc, int color);
 	public void moveRequest(int x, int y);

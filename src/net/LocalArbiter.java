@@ -41,7 +41,7 @@ class LocalArbiter
 		parent.handleArbiterMsg("server started");
 	}
 
-	public void connect(GameController ngc) {
+	public void connected(GameController ngc) {
 		appendToControllersList(ngc);
 	}
 
@@ -59,7 +59,7 @@ class LocalArbiter
 		connectedControllers.addElement(ngc);
 	}
 
-	public void disconnect(GameController gc) {
+	public void disconnected(GameController gc) {
 		for (int i = 0; i < connectedControllers.size(); ++i) {
 			if (connectedControllers.elementAt(i) == gc) {
 				connectedControllers.setElementAt(gc, i);

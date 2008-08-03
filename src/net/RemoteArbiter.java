@@ -25,9 +25,9 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 		}
 	}
 
-	public void connect(GameController gc) {
+	public void connected(GameController gc) {
 	}
-	public void disconnect(GameController gc) {
+	public void disconnected(GameController gc) {
 	}
 	public void handleColor(GameController gc, int color) {
 	}
