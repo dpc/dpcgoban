@@ -1,2 +1,5 @@
 all:
-	source /etc/profile.d/lib32-jdk.sh; ant
+	[ -f pre-build.sh ] && source pre-build.sh; ant
+
+doc:
+	doxygen Doxyfile
