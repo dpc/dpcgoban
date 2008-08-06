@@ -15,6 +15,7 @@ class LocalArbiter
 		}
 	}
 
+	protected int nextMoveColor = Board.COLOR_BLACK;
 	protected Parent parent;
 
 	GameController blackController;
@@ -69,10 +70,14 @@ class LocalArbiter
 	public void handleColor(GameController gc, int color) {
 		switch (color) {
 			case COLOR_WHITE:
-				whiteController = gc;
+				if (whiteController == null) {
+					whiteController = gc;
+				}
 				break;
 			case COLOR_BLACK:
-				blackController = gc;
+				if (blackController == null) {
+					blackController = gc;
+				}
 				break;
 		}
 	}
@@ -93,12 +98,29 @@ class LocalArbiter
 	}
 
 	public void moveRequest(GameController gcx, int x, int y) {
+		int color = -1;
+		if (gcx == whiteController && gcx == blackController) {
+			color = nextMoveColor;
+		} else if (gcx == whiteController) {
+			color = Board.COLOR_WHITE;
+		} else if (gcx == blackController) {
+			color = Board.COLOR_BLACK;
+		} else {
+			return;
+		}
+
+		if (color == Board.COLOR_BLACK) {
+			nextMoveColor = Board.COLOR_WHITE;
+		} else {
+			nextMoveColor = Board.COLOR_BLACK;
+		}
+
 		for (int i = 0; i < connectedControllers.size(); ++i) {
 			GameController gc = (GameController)(
 				connectedControllers.elementAt(i)
 				);
 			if (gc != null) {
-				gc.placeStone(x, y, Board.COLOR_WHITE);
+				gc.placeStone(x, y, color);
 			}
 		}
 	}

@@ -21,6 +21,14 @@ class LocalGameController implements GameController {
 		board.placeStone(x, y, c);
 	}
 
+	public void handleColor(int color) {
+		arbiter.handleColor(this, color);
+	}
+
+	public void unhandleColor(int color) {
+		arbiter.unhandleColor(this, color);
+	}
+
 	public String name() {
 		return "local";
 	}

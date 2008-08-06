@@ -29,7 +29,7 @@ class RemoteGameController
 
 	public void placeStone(int x, int y, int c) {
 		transport.sendMsg(
-				"stone "
+				Protocol.PLACE_STONE + " "
 				+ String.valueOf(x) + " "
 				+ String.valueOf(y) + " "
 				+ String.valueOf(c)
@@ -37,17 +37,42 @@ class RemoteGameController
 	}
 
 	public void receiveMsg(String msg) {
-		int first_break = msg.indexOf(' ');
-		if (first_break == -1) {
-			// without arguments.
-			// TODO: implement
+		Tokenizer s = new Tokenizer(msg);
+		String cmd = s.next();
+		if (cmd == Protocol.MOVE_REQUEST) {
+			String xs = s.next();
+			String ys = s.next();
+			if (xs == "" || ys == "") {
+				protocolFailure("no enought arguments for cmd: " + cmd);
+				return;
+			}
+			int x = Integer.parseInt(xs);
+			int y = Integer.parseInt(ys);
+			arbiter.moveRequest(this, x, y);
+			return;
+		} else if (
+				cmd == Protocol.HANDLE_COLOR
+				|| cmd == Protocol.UNHANDLE_COLOR
+				)
+		{
+			String cs = s.next();
+			if (cs == "") {
+				protocolFailure("no color argument for cmd: " + cmd);
+				return;
+			}
+			int c = Integer.parseInt(cs);
+			if (cmd == Protocol.HANDLE_COLOR) {
+				arbiter.handleColor(this, c);
+			} else {
+				arbiter.unhandleColor(this, c);
+			}
 			return;
 		}
-		String cmd = msg.substring(0, first_break);
-		if (cmd == "anything") {
-			//TODO: implement
-		}
-		return;
+		protocolFailure("unknown command: " + cmd);
+	}
+
+	protected void protocolFailure(String s) {
+		// TODO: FIXME
 	}
 
 	public void handleTransportDisconnected(

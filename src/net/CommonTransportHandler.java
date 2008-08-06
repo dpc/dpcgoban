@@ -49,7 +49,7 @@ abstract class CommonTransportHandler {
 			receivingBuf = receivingBuf.substring(
 					break_index + 1, receivingBuf.length()
 					);
-
+			cmd = cmd.trim();
 			if (cmd != "") {
 				handleIncomingRawCommand(cmd);
 			}

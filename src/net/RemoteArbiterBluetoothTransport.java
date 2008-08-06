@@ -123,7 +123,7 @@ class RemoteArbiterBluetoothTransport
 	}
 
 	public void handleIncomingCommand(String cmd) {
-		//TODO: implement me
+		parent.receiveMsg(cmd);
 	}
 }
 

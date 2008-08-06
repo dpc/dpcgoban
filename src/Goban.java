@@ -193,12 +193,18 @@ public class Goban extends Canvas
 	 * Request from current server giving user control over the black stones.
 	 */
 	public void playBlack() {
+		if (gameController != null) {
+			gameController.handleColor(Board.COLOR_BLACK);
+		}
 	}
 
 	/**
 	 * Request from current server giving user control over white stones.
 	 */
 	public void playWhite() {
+		if (gameController != null) {
+			gameController.handleColor(Board.COLOR_WHITE);
+		}
 	}
 
 	/**
