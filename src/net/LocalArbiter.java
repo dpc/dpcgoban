@@ -92,7 +92,7 @@ class LocalArbiter
 		}
 	}
 
-	public void moveRequest(int x, int y) {
+	public void moveRequest(GameController gcx, int x, int y) {
 		for (int i = 0; i < connectedControllers.size(); ++i) {
 			GameController gc = (GameController)(
 				connectedControllers.elementAt(i)

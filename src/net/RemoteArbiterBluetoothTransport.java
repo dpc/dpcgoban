@@ -109,8 +109,8 @@ class RemoteArbiterBluetoothTransport
 	}
 
 	public void sendMsg(String s)
-		throws IOException
 	{
+		send(s);
 	}
 
 	public int type() {

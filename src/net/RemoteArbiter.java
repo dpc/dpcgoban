@@ -35,7 +35,12 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 	}
 	public void unhandleColor(GameController gc, int color) {
 	}
-	public void moveRequest(int x, int y) {
+	public void moveRequest(GameController gc, int x, int y) {
+		transport.sendMsg(
+				"move "
+				+ String.valueOf(x) + " "
+				+ String.valueOf(y)
+				);
 	}
 
 	/**
@@ -50,11 +55,7 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 	public void handleTransportConnected(RemoteArbiterTransport t, String s) {
 		parent.handleArbiterInitFinished();
 		parent.handleArbiterMsg("Connected to: " + s);
-		try {
-			t.sendMsg("INIT");
-		} catch (IOException e) {
-			parent.handleArbiterMsg("IO ERROR");
-		}
+		t.sendMsg("INIT");
 	}
 
 	public void handleTransportDisconnected(

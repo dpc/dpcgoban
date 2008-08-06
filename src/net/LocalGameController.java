@@ -14,7 +14,7 @@ class LocalGameController implements GameController {
 	}
 
 	public void moveRequest() {
-		arbiter.moveRequest(board.getCrosshairX(), board.getCrosshairY());
+		arbiter.moveRequest(this, board.getCrosshairX(), board.getCrosshairY());
 	}
 
 	public void placeStone(int x, int y, int c) {

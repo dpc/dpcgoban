@@ -58,7 +58,7 @@ abstract class CommonTransportHandler {
 
 	protected void send(String cmd) {
 		try {
-			sendRaw(String.valueOf(messageOutCounter) + ": " + cmd);
+			sendRaw(String.valueOf(messageOutCounter) + ": " + cmd + "\n");
 		} catch (IOException e) {
 			// XXX: is it OK?
 			protocolFailure("couldn't write");

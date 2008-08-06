@@ -32,7 +32,7 @@ interface RemoteArbiterTransport {
 		void handleTransportInfo(RemoteArbiterTransport t, String s);
 	}
 
-	void sendMsg(String msg) throws IOException;
+	void sendMsg(String msg);
 	int type();
 
 	public void start();
