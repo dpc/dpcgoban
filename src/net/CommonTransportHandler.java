@@ -85,7 +85,9 @@ abstract class CommonTransportHandler {
 					);
 		}
 		messageInCounter++;
-		handleIncomingCommand(cmd.substring(break_index, cmd.length()));
+		handleIncomingCommand(cmd.substring(
+					break_index+1, cmd.length()
+					).trim());
 	}
 
 	/**
@@ -98,6 +100,7 @@ abstract class CommonTransportHandler {
 	 */
 	private void sendRaw(String s) throws IOException {
 		out.writeUTF(s);
+		out.flush();
 	}
 
 }

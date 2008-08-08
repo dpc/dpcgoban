@@ -17,27 +17,21 @@ class LocalArbiterPoller
 	protected Vector remoteGameControllerTransports = new Vector();
 	protected boolean finished = false;
 
-	interface Parent {
-	}
-
-	protected Parent parent;
-
 	/**
 	 * Private constructor.
 	 *
 	 * This is singleton - use only public static methods.
 	 */
-	private LocalArbiterPoller(Parent parent) {
-		this.parent = parent;
+	private LocalArbiterPoller() {
 		thread = new Thread(this);
 	}
 
 	/**
 	 * Initialize instance if neccessary.
 	 */
-	protected static void MakeSureInstanceReady(Parent parent) {
+	protected static void MakeSureInstanceReady() {
 		if (instance == null) {
-			instance = new LocalArbiterPoller(parent);
+			instance = new LocalArbiterPoller();
 			instance.start();
 		}
 	}
@@ -46,10 +40,9 @@ class LocalArbiterPoller
 	 * Register new GameController in poller instance.
 	 */
 	public static void RegisterNewRemoteGameControllerTransport(
-			Parent parent,
 			RemoteGameControllerTransport gct
 			) {
-		MakeSureInstanceReady(parent);
+		MakeSureInstanceReady();
 		instance.registerNewRemoteGameControllerTransport(gct);
 	}
 
@@ -122,7 +115,6 @@ class LocalArbiterPoller
 					try {
 						gc.poll();
 					} catch (IOException e) {
-						// TODO: some message?
 						// TODO: unregister anywere?
 						remoteGameControllerTransports.setElementAt(null, i);
 					}

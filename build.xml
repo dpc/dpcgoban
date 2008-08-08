@@ -71,7 +71,7 @@
 		jarfile="dpcgoban.jar"
 		prcfile="dpcgoban.prc"/-->
 
-		<wtkrun jadfile="dpcgoban.jad" device="DefaultColorPhone" wait="true"/>
+		<!-- <wtkrun jadfile="dpcgoban.jad" device="DefaultColorPhone" wait="true"/> -->
 
 	</target>
 

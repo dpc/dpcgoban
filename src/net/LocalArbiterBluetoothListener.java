@@ -73,11 +73,14 @@ class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 			parent.handleListenerUp(this);
 			while (!closed) {
 				StreamConnection conn = notifier.acceptAndOpen();
-				RemoteGameController gc = new RemoteGameController();
+				RemoteGameController gc = new RemoteGameController(parent);
 
 				RemoteGameControllerTransport transport =
 					new RemoteGameControllerBluetoothTransport(gc, conn);
 
+				LocalArbiterPoller.RegisterNewRemoteGameControllerTransport(
+						transport
+						);
 				parent.handleControllerConnected(gc);
 			}
 		} catch (IOException e) {

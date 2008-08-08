@@ -9,7 +9,7 @@ class LocalGameController implements GameController {
 		this.board = board;
 	}
 
-	public void connected(Arbiter arbiter) {
+	public void connectedTo(Arbiter arbiter) {
 		this.arbiter = arbiter;
 	}
 

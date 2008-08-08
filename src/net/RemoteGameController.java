@@ -12,8 +12,18 @@ class RemoteGameController
 	protected Arbiter arbiter;
 	protected RemoteGameControllerTransport transport;
 
-	public RemoteGameController()
+	public interface Parent {
+		public void handleRemoteGameControllerInfo(
+				RemoteGameController rgc,
+				String str
+				);
+	}
+
+	private Parent parent;
+
+	public RemoteGameController(Parent parent)
 		throws IOException {
+		this.parent = parent;
 	}
 
 	public void registerChildTransport(
@@ -23,7 +33,7 @@ class RemoteGameController
 	}
 
 
-	public void connected(Arbiter arbiter) {
+	public void connectedTo(Arbiter arbiter) {
 		this.arbiter = arbiter;
 	}
 
@@ -37,12 +47,24 @@ class RemoteGameController
 	}
 
 	public void receiveMsg(String msg) {
+		parent.handleRemoteGameControllerInfo(
+				this,
+				"GC Transport: received: " + msg
+				);
+
+		if (arbiter == null) {
+			parent.handleRemoteGameControllerInfo(
+					this,
+					"but the arbiter is null!"
+					);
+		}
+
 		Tokenizer s = new Tokenizer(msg);
 		String cmd = s.next();
-		if (cmd == Protocol.MOVE_REQUEST) {
+		if (cmd.equals(Protocol.MOVE_REQUEST)) {
 			String xs = s.next();
 			String ys = s.next();
-			if (xs == "" || ys == "") {
+			if (xs.equals("") || ys.equals("")) {
 				protocolFailure("no enought arguments for cmd: " + cmd);
 				return;
 			}
@@ -51,34 +73,42 @@ class RemoteGameController
 			arbiter.moveRequest(this, x, y);
 			return;
 		} else if (
-				cmd == Protocol.HANDLE_COLOR
-				|| cmd == Protocol.UNHANDLE_COLOR
+				(cmd.equals(Protocol.HANDLE_COLOR))
+				|| (cmd.equals(Protocol.UNHANDLE_COLOR))
 				)
 		{
 			String cs = s.next();
-			if (cs == "") {
+			if (cs.equals("")) {
 				protocolFailure("no color argument for cmd: " + cmd);
 				return;
 			}
 			int c = Integer.parseInt(cs);
-			if (cmd == Protocol.HANDLE_COLOR) {
+			if (cmd.equals(Protocol.HANDLE_COLOR)) {
 				arbiter.handleColor(this, c);
 			} else {
 				arbiter.unhandleColor(this, c);
 			}
 			return;
 		}
-		protocolFailure("unknown command: " + cmd);
+		protocolFailure("unknown command: '" + cmd + "'");
 	}
 
 	protected void protocolFailure(String s) {
 		// TODO: FIXME
+		parent.handleRemoteGameControllerInfo(
+				this,
+				"GC Transport: protocol failure: " + s
+				);
 	}
 
 	public void handleTransportDisconnected(
 			RemoteGameControllerTransport t, String s
 			) {
 
+		parent.handleRemoteGameControllerInfo(
+				this,
+				"GC Transport: disconnected: " + s
+				);
 	}
 
 	/**
@@ -87,9 +117,17 @@ class RemoteGameController
 	public void handleTransportConnected(
 			RemoteGameControllerTransport t, String s
 			) {
+		parent.handleRemoteGameControllerInfo(
+				this,
+				"GC Transport: connected: " + s
+				);
 	}
 
 	public void handleTransportInfo(RemoteGameControllerTransport t, String s) {
+		parent.handleRemoteGameControllerInfo(
+				this,
+				"GC Transport: " + s
+				);
 	}
 
 	public String name() {

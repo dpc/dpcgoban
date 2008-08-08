@@ -21,7 +21,7 @@ class RemoteArbiterBluetoothTransport
 
 	public RemoteArbiterBluetoothTransport(Parent parent) {
 		this.parent = parent;
-		parent.handleTransportInfo(this, "starting thread...");
+		parent.handleTransportInfo(this, "creating transport thread...");
 		thread = new Thread(this);
 	}
 
@@ -29,6 +29,7 @@ class RemoteArbiterBluetoothTransport
 
 	public void start() {
 		closed = false;
+		parent.handleTransportInfo(this, "starting transport thread...");
 		thread.start();
 	}
 
@@ -46,8 +47,6 @@ class RemoteArbiterBluetoothTransport
 					this,
 					"unknown server"
 					);
-			in =
-				streamConnection.openDataInputStream();
 			while (!closed) {
 				// use the connection
 				receive();

@@ -9,7 +9,7 @@ class Tokenizer {
 	}
 
 	public String next() {
-		if (str == "") {
+		if (str.equals("")) {
 			return "";
 		}
 		int i = str.indexOf(' ');

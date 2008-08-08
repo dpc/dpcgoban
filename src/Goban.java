@@ -154,7 +154,6 @@ public class Goban extends Canvas
 		try {
 			Arbiter arbiter = new LocalArbiter(this);
 			gameController = new LocalGameController(board);
-			gameController.connected(arbiter);
 			arbiter.connected(gameController);
 		} catch (LocalArbiter.CreationError e) {
 			logView.appendString(
@@ -179,7 +178,6 @@ public class Goban extends Canvas
 					RemoteArbiterTransport.BLUETOOTH
 					);
 			gameController = new LocalGameController(board);
-			gameController.connected(arbiter);
 			arbiter.connected(gameController);
 		} catch (RemoteArbiter.CreationError e) {
 			logView.appendString(

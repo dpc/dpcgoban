@@ -22,30 +22,35 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 
 		try {
 			transport = RemoteArbiterTransportFactory.Create(this, type);
-			transport.start();
 		} catch (InvalidArgumentException e) {
 			throw new CreationError(e.getMessage());
 		}
+		transport.start();
 	}
 
 	public void connected(GameController gc) {
 		gameController = gc;
+		gc.connectedTo(this);
 	}
+
 	public void disconnected(GameController gc) {
 		gameController = null;
 	}
+
 	public void handleColor(GameController gc, int color) {
 		transport.sendMsg(
 				Protocol.HANDLE_COLOR + " "
 				+ String.valueOf(color)
 				);
 	}
+
 	public void unhandleColor(GameController gc, int color) {
 		transport.sendMsg(
 				Protocol.UNHANDLE_COLOR + " "
 				+ String.valueOf(color)
 				);
 	}
+
 	public void moveRequest(GameController gc, int x, int y) {
 		transport.sendMsg(
 				Protocol.MOVE_REQUEST + " "
@@ -60,33 +65,38 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 	 * Will be called from different thread.
 	 */
 	public void receiveMsg(String msg) {
+		parent.handleArbiterMsg("RA received: " + msg);
+		if (this.gameController == null) {
+			protocolFailure("null gameController on receive");
+			return;
+		}
 		Tokenizer s = new Tokenizer(msg);
 		String cmd = s.next();
-		if (cmd == Protocol.PLACE_STONE) {
+		if (cmd.equals(Protocol.PLACE_STONE)) {
 			String xs = s.next();
 			String ys = s.next();
 			String cs = s.next();
-			if (xs == "" || ys == "" || cs == "") {
+			if (xs.equals("") || ys.equals("") || cs.equals("")) {
 				protocolFailure("no enought arguments for cmd: " + cmd);
 				return;
 			}
 			int x = Integer.parseInt(xs);
 			int y = Integer.parseInt(ys);
-			int c = Integer.parseInt(ys);
+			int c = Integer.parseInt(cs);
 			gameController.placeStone(x, y, c);
 			return;
 		}
-		protocolFailure("unknown command: " + cmd);
+		protocolFailure("unknown command: '" + cmd + "'");
 	}
 
 	protected void protocolFailure(String s) {
 		// TODO: FIXME
+		parent.handleArbiterMsg("Protocol failure: " + s);
 	}
 
 	public void handleTransportConnected(RemoteArbiterTransport t, String s) {
 		parent.handleArbiterInitFinished();
 		parent.handleArbiterMsg("Connected to: " + s);
-		t.sendMsg("INIT");
 	}
 
 	public void handleTransportDisconnected(
@@ -95,7 +105,6 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 			) {
 		parent.handleArbiterMsg(s);
 		t.stop();
-		t = null;
 	}
 
 	public void handleTransportInfo(RemoteArbiterTransport t, String s) {

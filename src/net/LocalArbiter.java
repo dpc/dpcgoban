@@ -43,6 +43,7 @@ class LocalArbiter
 	}
 
 	public void connected(GameController ngc) {
+		ngc.connectedTo(this);
 		appendToControllersList(ngc);
 	}
 
@@ -115,6 +116,10 @@ class LocalArbiter
 			nextMoveColor = Board.COLOR_BLACK;
 		}
 
+		placeStone(x, y, color);
+	}
+
+	public void placeStone(int x, int y, int color) {
 		for (int i = 0; i < connectedControllers.size(); ++i) {
 			GameController gc = (GameController)(
 				connectedControllers.elementAt(i)
@@ -137,9 +142,15 @@ class LocalArbiter
 
 	public void handleControllerConnected(RemoteGameController c) {
 		parent.handleArbiterMsg("new client connection");
+		connected(c);
 	}
+
 
 	public void handleControllerDisconnected(RemoteGameController c) {
 		parent.handleArbiterMsg("client disconnected connection");
+	}
+
+	public void handleRemoteGameControllerInfo(RemoteGameController c, String s) {
+		parent.handleArbiterMsg("arbiter: " + s);
 	}
 }

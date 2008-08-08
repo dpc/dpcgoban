@@ -9,7 +9,7 @@ interface LocalArbiterListener {
 	 * Interface to be implemented by owner of
 	 * this listener.
 	 */
-	public interface Parent {
+	public interface Parent extends RemoteGameController.Parent {
 		/**
 		 * Called to notify parent about disconnect exception.
 		 *
