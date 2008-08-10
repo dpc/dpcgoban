@@ -65,7 +65,6 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 	 * Will be called from different thread.
 	 */
 	public void receiveMsg(String msg) {
-		parent.handleArbiterMsg("RA received: " + msg);
 		if (this.gameController == null) {
 			protocolFailure("null gameController on receive");
 			return;
@@ -84,6 +83,12 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 			int y = Integer.parseInt(ys);
 			int c = Integer.parseInt(cs);
 			gameController.placeStone(x, y, c);
+			return;
+		} else if (cmd.equals(Protocol.CLEAR_BOARD)) {
+			gameController.clearBoard();
+			return;
+		} else if (cmd.equals(Protocol.GAME_INFO)) {
+			gameController.gameInfo(s.rest());
 			return;
 		}
 		protocolFailure("unknown command: '" + cmd + "'");

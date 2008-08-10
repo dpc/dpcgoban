@@ -1,5 +1,5 @@
-import java.io.DataOutputStream;
-import java.io.DataInputStream;
+import java.io.OutputStream;
+import java.io.InputStream;
 import java.io.IOException;
 
 /**
@@ -15,10 +15,10 @@ abstract class CommonTransportHandler {
 	 */
 	private int messageInCounter = 0;
 
-	private String receivingBuf = "";
+	private byte[] receivingBuf = new byte[0];
 
-	protected DataInputStream in;
-	protected DataOutputStream out;
+	protected InputStream in;
+	protected OutputStream out;
 
 	protected abstract void handleIncomingCommand(String s);
 	protected abstract void protocolFailure(String s);
@@ -39,18 +39,28 @@ abstract class CommonTransportHandler {
 		if (available > 0) {
 			byte new_data[] = new byte[available];
 			in.read(new_data);
-			receivingBuf = receivingBuf + new String(new_data);
+			int newBufSize = receivingBuf.length + available;
+			byte[] newBuf = new byte[newBufSize];
+			for (int i = 0; i < receivingBuf.length; ++i) {
+				newBuf[i] = receivingBuf[i];
+			}
+
+			for (int i = receivingBuf.length; i < newBufSize; ++i) {
+				newBuf[i] = new_data[i - receivingBuf.length];
+			}
+			receivingBuf = newBuf;
 		}
-		int break_index = receivingBuf.indexOf('\n');
+		String bufString = new String(receivingBuf, "UTF8");
+
+		int break_index = bufString.indexOf('\n');
 		if (break_index != -1) {
 			// cmd without break
-			String cmd = receivingBuf.substring(0, break_index);
+			String cmd = bufString.substring(0, break_index);
 			// rest of the buf without break
-			receivingBuf = receivingBuf.substring(
-					break_index + 1, receivingBuf.length()
-					);
-			cmd = cmd.trim();
-			if (cmd != "") {
+			receivingBuf = bufString.substring(
+					break_index + 1, bufString.length()
+					).getBytes("UTF8");
+					if (!cmd.equals("")) {
 				handleIncomingRawCommand(cmd);
 			}
 		}
@@ -75,7 +85,7 @@ abstract class CommonTransportHandler {
 			protocolFailure("no ':' found");
 			return;
 		}
-		int id = Integer.parseInt(cmd.substring(0, break_index));
+		int id = Integer.parseInt(cmd.substring(0, break_index).trim());
 		if (id != messageInCounter) {
 			protocolFailure(
 					"invalid id: "
@@ -99,7 +109,7 @@ abstract class CommonTransportHandler {
 	 * Must be non-blocking!
 	 */
 	private void sendRaw(String s) throws IOException {
-		out.writeUTF(s);
+		out.write(s.getBytes("UTF8"));
 		out.flush();
 	}
 

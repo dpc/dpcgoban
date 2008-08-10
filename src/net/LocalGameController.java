@@ -4,9 +4,11 @@ class LocalGameController implements GameController {
 
 	Arbiter arbiter;
 	Board board;
+	LogView log;
 
-	public LocalGameController(Board board) {
+	public LocalGameController(Board board, LogView log) {
 		this.board = board;
+		this.log = log;
 	}
 
 	public void connectedTo(Arbiter arbiter) {
@@ -19,6 +21,14 @@ class LocalGameController implements GameController {
 
 	public void placeStone(int x, int y, int c) {
 		board.placeStone(x, y, c);
+	}
+
+	public void clearBoard() {
+		board.clearBoard();
+	}
+
+	public void gameInfo(String s) {
+		log.appendString("GAME: " + s);
 	}
 
 	public void handleColor(int color) {

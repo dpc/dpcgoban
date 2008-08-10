@@ -44,6 +44,7 @@ class LocalArbiter
 
 	public void connected(GameController ngc) {
 		ngc.connectedTo(this);
+		initGameControllerBoard(ngc);
 		appendToControllersList(ngc);
 	}
 
@@ -73,11 +74,17 @@ class LocalArbiter
 			case COLOR_WHITE:
 				if (whiteController == null) {
 					whiteController = gc;
+					gameInfo("white color is now occupied");
+				} else {
+					gameInfo(gc, "color already occupied");
 				}
 				break;
 			case COLOR_BLACK:
 				if (blackController == null) {
+					gameInfo("black color is now occupied");
 					blackController = gc;
+				} else {
+					gameInfo(gc, "color already occupied");
 				}
 				break;
 		}
@@ -88,11 +95,17 @@ class LocalArbiter
 			case COLOR_WHITE:
 				if (whiteController == gc) {
 					whiteController = null;
+					gameInfo("white color is now free");
+				} else {
+					gameInfo(gc, "you are not playing white");
 				}
 				break;
 			case COLOR_BLACK:
 				if (blackController == gc) {
 					blackController = null;
+					gameInfo("black color is now free");
+				} else {
+					gameInfo(gc, "you are not playing black");
 				}
 				break;
 		}
@@ -128,6 +141,27 @@ class LocalArbiter
 				gc.placeStone(x, y, color);
 			}
 		}
+	}
+
+	public void initGameControllerBoard(GameController gc) {
+		gc.clearBoard();
+
+		// TODO: send current map
+	}
+
+	public void gameInfo(String s) {
+		for (int i = 0; i < connectedControllers.size(); ++i) {
+			GameController gc = (GameController)(
+				connectedControllers.elementAt(i)
+				);
+			if (gc != null) {
+				gameInfo(gc, s);
+			}
+		}
+	}
+
+	public void gameInfo(GameController gc, String s) {
+		gc.gameInfo(s);
 	}
 
 	public void handleListenerInfo(LocalArbiterListener l, String msg) {

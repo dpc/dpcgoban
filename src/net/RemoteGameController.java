@@ -46,12 +46,21 @@ class RemoteGameController
 				);
 	}
 
-	public void receiveMsg(String msg) {
-		parent.handleRemoteGameControllerInfo(
-				this,
-				"GC Transport: received: " + msg
+	public void clearBoard() {
+		transport.sendMsg(
+				Protocol.CLEAR_BOARD
 				);
+	}
 
+	public void gameInfo(String s) {
+		transport.sendMsg(
+				Protocol.GAME_INFO + " " +
+				s
+				);
+	}
+
+
+	public void receiveMsg(String msg) {
 		if (arbiter == null) {
 			parent.handleRemoteGameControllerInfo(
 					this,
