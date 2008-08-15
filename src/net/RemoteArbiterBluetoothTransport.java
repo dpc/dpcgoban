@@ -43,15 +43,23 @@ class RemoteArbiterBluetoothTransport
 	public void run() {
 		try {
 			initBluetooth();
+		} catch(IOException e) {
+			parent.handleTransportInfo(
+					this,
+					"couldn't connect: " + e.toString()
+					);
+			return;
+		}
+
+		try {
 			parent.handleTransportConnected(
 					this,
 					"unknown server"
 					);
 			while (!closed) {
-				// use the connection
 				receive();
 				try {
-					Thread.sleep(100);
+					Thread.sleep(10);
 				} catch (InterruptedException e) {}
 			}
 			finishBluetooth();
@@ -75,7 +83,15 @@ class RemoteArbiterBluetoothTransport
 			// Select the service. Indicate no
 			// authentication or encryption is required.
 			LocalDevice localDevice = LocalDevice.getLocalDevice();
+
+			if (localDevice == null) {
+				throw new IOException("couldn't get localDevice");
+			}
 			discoveryAgent = localDevice.getDiscoveryAgent();
+
+			if (discoveryAgent == null) {
+				throw new IOException("couldn't get localDevice");
+			}
 			parent.handleTransportInfo(this, "selecting service...");
 			String connectionURL =
 				discoveryAgent.selectService(
@@ -83,6 +99,10 @@ class RemoteArbiterBluetoothTransport
 						ServiceRecord.NOAUTHENTICATE_NOENCRYPT,
 						false
 						);
+
+			if (connectionURL == null || connectionURL.equals("")) {
+				throw new IOException("couldn't find any services");
+			}
 
 			parent.handleTransportInfo(this, "opening connection...");
 			StreamConnection stream

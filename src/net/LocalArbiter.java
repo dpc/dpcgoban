@@ -7,7 +7,8 @@ import java.util.Vector;
  */
 class LocalArbiter
 	implements Arbiter,
-			   LocalArbiterListener.Parent
+			   LocalArbiterListener.Parent,
+			   BoardLogic.Parent
 {
 	public class CreationError extends Exception {
 		public CreationError(String s) {
@@ -15,18 +16,22 @@ class LocalArbiter
 		}
 	}
 
-	protected int nextMoveColor = Board.COLOR_BLACK;
+	protected int nextMoveColor = BoardLogic.COLOR_BLACK;
 	protected Parent parent;
 
 	GameController blackController;
 	GameController whiteController;
 
 	LocalArbiterListener listener;
+	BoardLogic boardLogic;
 
 	Vector connectedControllers = new Vector();
 
 	public LocalArbiter(Parent parent) throws CreationError {
 		this.parent = parent;
+
+		boardLogic = new BoardLogic(this);
+
 		try {
 			listener = LocalArbiterListenerFactory.Create(
 				this, LocalArbiterListener.BLUETOOTH
@@ -112,41 +117,51 @@ class LocalArbiter
 	}
 
 	public void moveRequest(GameController gcx, int x, int y) {
-		int color = -1;
-		if (gcx == whiteController && gcx == blackController) {
-			color = nextMoveColor;
-		} else if (gcx == whiteController) {
-			color = Board.COLOR_WHITE;
-		} else if (gcx == blackController) {
-			color = Board.COLOR_BLACK;
-		} else {
+
+		if (whiteController == null || blackController == null) {
+			gcx.gameInfo("both colors need to be occupied");
 			return;
 		}
 
-		if (color == Board.COLOR_BLACK) {
-			nextMoveColor = Board.COLOR_WHITE;
+		if (gcx == whiteController && gcx == blackController) {
+		} else if (gcx == whiteController) {
+			if (nextMoveColor != BoardLogic.COLOR_WHITE) {
+				gcx.gameInfo("not your turn");
+				return;
+			}
+		} else if (gcx == blackController) {
+			if (nextMoveColor != BoardLogic.COLOR_BLACK) {
+				gcx.gameInfo("not your turn");
+				return;
+			}
 		} else {
-			nextMoveColor = Board.COLOR_BLACK;
+			gcx.gameInfo("you are only a observer");
+			return;
 		}
 
-		placeStone(x, y, color);
-	}
-
-	public void placeStone(int x, int y, int color) {
-		for (int i = 0; i < connectedControllers.size(); ++i) {
-			GameController gc = (GameController)(
-				connectedControllers.elementAt(i)
-				);
-			if (gc != null) {
-				gc.placeStone(x, y, color);
+		try {
+			boardLogic.moveRequest(x, y, nextMoveColor);
+			if (nextMoveColor == BoardLogic.COLOR_BLACK) {
+				nextMoveColor = BoardLogic.COLOR_WHITE;
+			} else {
+				nextMoveColor = BoardLogic.COLOR_BLACK;
 			}
+		} catch (InvalidArgumentException e) {
+			gcx.gameInfo("invalid move");
 		}
 	}
 
 	public void initGameControllerBoard(GameController gc) {
 		gc.clearBoard();
 
-		// TODO: send current map
+		for (int x = 0; x < boardLogic.getSize(); ++x) {
+			for (int y = 0; y < boardLogic.getSize(); ++y) {
+				int c = boardLogic.getColor(x, y);
+				if (c != BoardLogic.COLOR_NONE) {
+					gc.placeStone(x, y, c);
+				}
+			}
+		}
 	}
 
 	public void gameInfo(String s) {
@@ -179,12 +194,50 @@ class LocalArbiter
 		connected(c);
 	}
 
-
 	public void handleControllerDisconnected(RemoteGameController c) {
 		parent.handleArbiterMsg("client disconnected connection");
 	}
 
-	public void handleRemoteGameControllerInfo(RemoteGameController c, String s) {
+	public void handleRemoteGameControllerInfo(
+			RemoteGameController c, String s
+			) {
 		parent.handleArbiterMsg("arbiter: " + s);
 	}
+
+	public void handleBoardStoneChange (
+			BoardLogic bl, int x, int y, int color, int status
+			)
+	{
+		for (int i = 0; i < connectedControllers.size(); ++i) {
+			GameController gc = (GameController)(
+					connectedControllers.elementAt(i)
+					);
+			if (gc != null) {
+				gc.placeStone(x, y, color);
+			}
+		}
+	}
+
+	public void handleBoardResize(
+			BoardLogic bl, int new_size
+			)
+	{
+		// TODO: implement
+	}
+
+	public void handleBoardClear(
+			BoardLogic bl
+			)
+	{
+		nextMoveColor = BoardLogic.COLOR_BLACK;
+		for (int i = 0; i < connectedControllers.size(); ++i) {
+			GameController gc = (GameController)(
+					connectedControllers.elementAt(i)
+					);
+			if (gc != null) {
+				gc.clearBoard();
+			}
+		}
+	}
+
 }

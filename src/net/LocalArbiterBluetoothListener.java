@@ -52,9 +52,13 @@ class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 					"btspp://localhost:" + CommonBluetooth.MAGIC_UUID
 					);
 
+			if (notifier == null) {
+				throw new IOException("couldn't get notifier");
+			}
+
 		} catch (BluetoothStateException e) {
 			closed = true;
-		} catch (IOException e) {
+			throw new IOException(e.toString());
 		}
 		parent.handleListenerUp();
 	}
@@ -70,9 +74,23 @@ class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 					"starting up server socket..."
 					);
 			initListener();
+		} catch (IOException e) {
+			parent.handleListenerInfo(
+					this,
+					"couldn't start server"
+					);
+			return;
+		}
+
+
+		try {
 			parent.handleListenerUp(this);
 			while (!closed) {
 				StreamConnection conn = notifier.acceptAndOpen();
+				if (conn == null) {
+					parent.handleListenerInfo(this, "null conn ?!");
+					continue;
+				}
 				RemoteGameController gc = new RemoteGameController(parent);
 
 				RemoteGameControllerTransport transport =

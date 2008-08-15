@@ -29,7 +29,7 @@ abstract class CommonTransportHandler {
 	 * Non-blocking function that should
 	 * handle incoming acks and commands.
 	 */
-	protected void receive() throws IOException {
+	private boolean receiveOne() throws IOException {
 		int available = in.available();
 		// XXX: TODO: potential bug
 		// utf strings that comes partially may be
@@ -62,6 +62,16 @@ abstract class CommonTransportHandler {
 					).getBytes("UTF8");
 					if (!cmd.equals("")) {
 				handleIncomingRawCommand(cmd);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected void receive() throws IOException {
+		for (int i = 0; i < 10; ++i) {
+			if (!receiveOne()) {
+				break;
 			}
 		}
 	}
