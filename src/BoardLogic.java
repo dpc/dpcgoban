@@ -2,7 +2,7 @@
 /**
  * Go board logic.
  *
- * I'm not very fund of it, but it seems to do its job.
+ * I'm not very fond of it, but it seems to do its job.
  *
  * TODO: ko
  */
