@@ -11,12 +11,18 @@ class LocalGameController implements GameController {
 		this.log = log;
 	}
 
-	public void connectedTo(Arbiter arbiter) {
+	public void connectedTo(LocalArbiter arbiter) {
+		this.arbiter = arbiter;
+	}
+
+	public void connectedTo(RemoteArbiter arbiter) {
 		this.arbiter = arbiter;
 	}
 
 	public void moveRequest() {
-		arbiter.moveRequest(this, board.getCrosshairX(), board.getCrosshairY());
+		if (arbiter != null) {
+			arbiter.moveRequest(this, board.getCrosshairX(), board.getCrosshairY());
+		}
 	}
 
 	public void placeStone(int x, int y, int c) {
@@ -27,16 +33,28 @@ class LocalGameController implements GameController {
 		board.clearBoard();
 	}
 
+	public boolean isActive() {
+		return arbiter != null;
+	}
+
+	public void shutdown() {
+		arbiter = null;
+	}
+
 	public void gameInfo(String s) {
 		log.appendString("GAME: " + s);
 	}
 
 	public void handleColor(int color) {
-		arbiter.handleColor(this, color);
+		if (arbiter != null) {
+			arbiter.handleColor(this, color);
+		}
 	}
 
 	public void unhandleColor(int color) {
-		arbiter.unhandleColor(this, color);
+		if (arbiter != null) {
+			arbiter.unhandleColor(this, color);
+		}
 	}
 
 	public String name() {

@@ -40,9 +40,14 @@ interface RemoteGameControllerTransport {
 				);
 
 		void handleTransportInfo(RemoteGameControllerTransport t, String s);
+
+
+		boolean isPingValid();
+		GameController gameController();
 	}
 
 	void sendMsg(String msg);
 	void poll() throws IOException;
+	GameController gameController();
 	int type();
 }

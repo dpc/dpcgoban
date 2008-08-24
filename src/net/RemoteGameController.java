@@ -1,5 +1,6 @@
 import javax.microedition.io.StreamConnection;
 import java.io.IOException;
+import java.lang.System;
 
 /**
  * Remote controller from the point of view
@@ -9,7 +10,7 @@ class RemoteGameController
 	implements GameController,
 			   RemoteGameControllerTransport.Parent {
 
-	protected Arbiter arbiter;
+	protected LocalArbiter arbiter;
 	protected RemoteGameControllerTransport transport;
 
 	public interface Parent {
@@ -19,11 +20,14 @@ class RemoteGameController
 				);
 	}
 
+	long lastPing;
+
 	private Parent parent;
 
 	public RemoteGameController(Parent parent)
 		throws IOException {
 		this.parent = parent;
+		touchLastPing();
 	}
 
 	public void registerChildTransport(
@@ -32,8 +36,15 @@ class RemoteGameController
 		this.transport = transport;
 	}
 
+	public boolean isActive() {
+		return arbiter != null;
+	}
 
-	public void connectedTo(Arbiter arbiter) {
+	public boolean isPingValid() {
+		return (lastPing + 1000 * 11) > System.currentTimeMillis();
+	}
+
+	public void connectedTo(LocalArbiter arbiter) {
 		this.arbiter = arbiter;
 	}
 
@@ -44,6 +55,14 @@ class RemoteGameController
 				+ String.valueOf(y) + " "
 				+ String.valueOf(c)
 				);
+	}
+
+	public void shutdown() {
+		//
+	}
+
+	protected void touchLastPing() {
+		lastPing = System.currentTimeMillis();
 	}
 
 	public void clearBoard() {
@@ -58,7 +77,9 @@ class RemoteGameController
 				s
 				);
 	}
-
+	public void sendNewPong() {
+		transport.sendMsg(Protocol.PONG);
+	}
 
 	public void receiveMsg(String msg) {
 		if (arbiter == null) {
@@ -98,7 +119,15 @@ class RemoteGameController
 				arbiter.unhandleColor(this, c);
 			}
 			return;
+		} else if (
+				cmd.equals(Protocol.PING)
+				)
+		{
+			touchLastPing();
+			sendNewPong();
+			return;
 		}
+
 		protocolFailure("unknown command: '" + cmd + "'");
 	}
 
@@ -118,6 +147,12 @@ class RemoteGameController
 				this,
 				"GC Transport: disconnected: " + s
 				);
+		arbiter.disconnected(this);
+		arbiter = null;
+	}
+
+	public GameController gameController() {
+		return this;
 	}
 
 	/**

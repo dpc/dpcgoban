@@ -5,9 +5,8 @@ interface Arbiter {
 	}
 	final static int COLOR_BLACK = 0;
 	final static int COLOR_WHITE = 1;
-	public void connected(GameController gc);
-	public void disconnected(GameController gc);
 
+	public void shutdown();
 
 	// =========================================
 	// Things that are requests from the GameControler

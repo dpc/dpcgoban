@@ -96,10 +96,7 @@ class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 				RemoteGameControllerTransport transport =
 					new RemoteGameControllerBluetoothTransport(gc, conn);
 
-				LocalArbiterPoller.RegisterNewRemoteGameControllerTransport(
-						transport
-						);
-				parent.handleControllerConnected(gc);
+				parent.handleControllerTransportConnected(transport);
 			}
 		} catch (IOException e) {
 			closed = true;

@@ -19,16 +19,19 @@ class LocalArbiter
 	protected int nextMoveColor = BoardLogic.COLOR_BLACK;
 	protected Parent parent;
 
-	GameController blackController;
-	GameController whiteController;
+	protected GameController blackController;
+	protected GameController whiteController;
 
-	LocalArbiterListener listener;
-	BoardLogic boardLogic;
+	protected LocalArbiterListener listener;
+	protected LocalArbiterPoller poller;
+	protected BoardLogic boardLogic;
 
-	Vector connectedControllers = new Vector();
+	protected Vector connectedControllers = new Vector();
 
 	public LocalArbiter(Parent parent) throws CreationError {
 		this.parent = parent;
+		poller = new LocalArbiterPoller();
+		poller.start();
 
 		boardLogic = new BoardLogic(this);
 
@@ -70,10 +73,33 @@ class LocalArbiter
 	public void disconnected(GameController gc) {
 		for (int i = 0; i < connectedControllers.size(); ++i) {
 			if (connectedControllers.elementAt(i) == gc) {
-				connectedControllers.setElementAt(gc, i);
+				connectedControllers.setElementAt(null, i);
+			}
+		}
+
+		if (whiteController == gc) {
+			whiteController = null;
+			gameInfo("white are now free to play");
+		}
+		if (blackController == gc) {
+			blackController = null;
+			gameInfo("black are now free to play");
+		}
+		gc.shutdown();
+	}
+
+	public void shutdown() {
+		poller.stop();
+		for (int i = 0; i < connectedControllers.size(); ++i) {
+			GameController gc = (GameController)(
+					connectedControllers.elementAt(i)
+					);
+			if (gc != null) {
+				gc.shutdown();
 			}
 		}
 	}
+
 	public void handleColor(GameController gc, int color) {
 		switch (color) {
 			case COLOR_WHITE:
@@ -190,8 +216,16 @@ class LocalArbiter
 	}
 
 	public void handleControllerConnected(RemoteGameController c) {
+	}
+
+	public void handleControllerTransportConnected(
+			RemoteGameControllerTransport transport
+			) {
 		parent.handleArbiterMsg("new client connection");
-		connected(c);
+		poller.registerNewRemoteGameControllerTransport(
+				transport
+				);
+		connected(transport.gameController());
 	}
 
 	public void handleControllerDisconnected(RemoteGameController c) {

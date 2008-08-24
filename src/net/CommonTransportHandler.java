@@ -90,6 +90,7 @@ abstract class CommonTransportHandler {
 	 * Handle incomming protocol command with id.
 	 */
 	private void handleIncomingRawCommand(String cmd) {
+		System.out.println("R:" + cmd);
 		int break_index = cmd.indexOf(':');
 		if (break_index == -1) {
 			protocolFailure("no ':' found");
@@ -119,8 +120,10 @@ abstract class CommonTransportHandler {
 	 * Must be non-blocking!
 	 */
 	private void sendRaw(String s) throws IOException {
+		System.out.println("W:" + s);
 		out.write(s.getBytes("UTF8"));
 		out.flush();
+		System.out.println("WEND");
 	}
 
 }

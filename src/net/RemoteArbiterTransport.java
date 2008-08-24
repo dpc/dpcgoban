@@ -30,6 +30,10 @@ interface RemoteArbiterTransport {
 		void handleTransportConnected(RemoteArbiterTransport t, String s);
 
 		void handleTransportInfo(RemoteArbiterTransport t, String s);
+
+		boolean shouldSentNewPing();
+		void sentNewPing();
+		boolean isLastPongValid();
 	}
 
 	void sendMsg(String msg);

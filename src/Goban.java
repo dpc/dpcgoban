@@ -46,13 +46,13 @@ public class Goban extends Canvas
 	 */
 	public Command beClientCmd = new Command(
 			"Connect to remote",
-			Command.SCREEN, 11
+			Command.SCREEN, 12
 			);
 
 	/**
 	 * Request hosting a local server command.
 	 */
-	public Command beServerCmd = new Command("Host game", Command.SCREEN, 12);
+	public Command beServerCmd = new Command("Host game", Command.SCREEN, 11);
 
 	/**
 	 * Request that user want to play white stones (possibly: too) command.
@@ -121,7 +121,7 @@ public class Goban extends Canvas
 	 * Local game controller.
 	 */
 	public LocalGameController gameController;
-
+	public Arbiter arbiter;
 	/**
 	 * Ctor.
 	 */
@@ -151,10 +151,12 @@ public class Goban extends Canvas
 	 * incoming players.
 	 */
 	public void beServer() {
+		shutdown();
 		try {
-			Arbiter arbiter = new LocalArbiter(this);
+			LocalArbiter arbiter = new LocalArbiter(this);
 			gameController = new LocalGameController(board, logView);
 			arbiter.connected(gameController);
+			this.arbiter = arbiter;
 		} catch (LocalArbiter.CreationError e) {
 			logView.appendString(
 				"Couldn't create server. Reason: `"
@@ -172,18 +174,31 @@ public class Goban extends Canvas
 	 * and play game there.
 	 */
 	public void beClient() {
+		shutdown();
 		try {
-			Arbiter arbiter = new RemoteArbiter(
+			RemoteArbiter arbiter = new RemoteArbiter(
 					this,
 					RemoteArbiterTransport.BLUETOOTH
 					);
 			gameController = new LocalGameController(board, logView);
 			arbiter.connected(gameController);
+			this.arbiter = arbiter;
 		} catch (RemoteArbiter.CreationError e) {
 			logView.appendString(
 				"Couldn't connect to server. Reason: `"
 				+ e.getMessage() + "'"
 				);
+		}
+	}
+
+	public void shutdown() {
+		if (arbiter != null) {
+			arbiter.shutdown();
+			arbiter = null;
+		}
+		if (gameController != null) {
+			gameController.shutdown();
+			gameController = null;
 		}
 	}
 
@@ -255,8 +270,8 @@ public class Goban extends Canvas
 		addCommand(exitCmd);
 		addCommand(playWhiteCmd);
 		addCommand(playBlackCmd);
-		addCommand(beClientCmd);
 		addCommand(beServerCmd);
+		addCommand(beClientCmd);
 		addCommand(printHelpCmd);
 		demo = null;
 		repaintUI();
@@ -355,7 +370,14 @@ public class Goban extends Canvas
 	 * Is game currently active.
 	 */
 	public boolean isActive() {
-		return gameController != null;
+		if (gameController == null) {
+			return false;
+		}
+
+		if (!gameController.isActive()) {
+			return false;
+		}
+		return true;
 	}
 
 	/**

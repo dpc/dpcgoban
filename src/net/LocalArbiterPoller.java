@@ -7,11 +7,13 @@ import java.io.IOException;
  * This class is singleton-thread that will record
  * all the new connection and handle them in loop
  * to let them read incoming data.
+ *
+ * LocalArbiter instance is the owner/parent of instances of this
+ * class.
  */
 class LocalArbiterPoller
 	implements Runnable {
 
-	static private LocalArbiterPoller instance;
 	protected Thread thread;
 
 	protected Vector remoteGameControllerTransports = new Vector();
@@ -22,34 +24,14 @@ class LocalArbiterPoller
 	 *
 	 * This is singleton - use only public static methods.
 	 */
-	private LocalArbiterPoller() {
+	public LocalArbiterPoller() {
 		thread = new Thread(this);
-	}
-
-	/**
-	 * Initialize instance if neccessary.
-	 */
-	protected static void MakeSureInstanceReady() {
-		if (instance == null) {
-			instance = new LocalArbiterPoller();
-			instance.start();
-		}
-	}
-
-	/**
-	 * Register new GameController in poller instance.
-	 */
-	public static void RegisterNewRemoteGameControllerTransport(
-			RemoteGameControllerTransport gct
-			) {
-		MakeSureInstanceReady();
-		instance.registerNewRemoteGameControllerTransport(gct);
 	}
 
 	/**
 	 * Register new GameController in poller.
 	 */
-	protected void registerNewRemoteGameControllerTransport(
+	public void registerNewRemoteGameControllerTransport(
 			RemoteGameControllerTransport gct
 			) {
 		synchronized (remoteGameControllerTransports) {
@@ -66,7 +48,7 @@ class LocalArbiterPoller
 	/**
 	 * Start poller thread.
 	 */
-	protected void start() {
+	public void start() {
 		finished = false;
 		thread.start();
 	}
@@ -74,23 +56,11 @@ class LocalArbiterPoller
 	/**
 	 * Stop poller thread.
 	 */
-	protected void stop() {
+	public void stop() {
 		try {
 			finished = true;
 			thread.join();
 		} catch (InterruptedException ie) {}
-	}
-
-	/**
-	 * Stop poller instance.
-	 *
-	 * (and mark it for deletion)
-	 */
-	public static void Stop() {
-		if (instance != null) {
-			instance.stop();
-			instance = null;
-		}
 	}
 
 	/**

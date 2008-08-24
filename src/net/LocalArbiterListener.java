@@ -21,7 +21,7 @@ interface LocalArbiterListener {
 		/**
 		 * Called after connection was estabilished.
 		 */
-		void handleControllerConnected(RemoteGameController c);
+		void handleControllerTransportConnected(RemoteGameControllerTransport c);
 
 		void handleListenerUp(LocalArbiterListener l);
 		void handleListenerDown(LocalArbiterListener l, String s);

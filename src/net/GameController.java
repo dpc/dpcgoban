@@ -3,6 +3,8 @@ interface GameController {
 	public void clearBoard();
 	public void gameInfo(String s);
 	public String name();
+	public boolean isActive();
+	public void shutdown();
 
-	public void connectedTo(Arbiter arbiter);
+	public void connectedTo(LocalArbiter arbiter);
 }

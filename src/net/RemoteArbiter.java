@@ -1,4 +1,5 @@
-import java.io.*;
+//import java.io.*;
+import java.lang.System;
 
 /**
  * Remote arbiter.
@@ -7,13 +8,16 @@ import java.io.*;
  */
 class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 	RemoteArbiterTransport transport;
-	GameController gameController;
+	LocalGameController gameController;
 
 	public class CreationError extends Exception {
 		public CreationError(String s) {
 			super(s);
 		}
 	}
+
+	private long lastPong;
+	private long lastPing;
 
 	public Parent parent;
 
@@ -25,16 +29,47 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 		} catch (InvalidArgumentException e) {
 			throw new CreationError(e.getMessage());
 		}
+		touchLastPong();
+		touchLastPing();
 		transport.start();
 	}
 
-	public void connected(GameController gc) {
-		gameController = gc;
-		gc.connectedTo(this);
+	protected void touchLastPong() {
+		lastPong = System.currentTimeMillis();
 	}
 
-	public void disconnected(GameController gc) {
-		gameController = null;
+	protected void touchLastPing() {
+		lastPing = System.currentTimeMillis();
+	}
+
+	public boolean isLastPongValid() {
+		return ((lastPing - lastPong) < 1000 * 5);
+	}
+
+	public boolean shouldSentNewPing() {
+		return (System.currentTimeMillis() > (lastPing + 1000 * 10));
+	}
+
+	public void sentNewPing() {
+		transport.sendMsg(Protocol.PING);
+		touchLastPing();
+	}
+
+	public void shutdown() {
+		parent.handleArbiterMsg("hiere");
+		if (gameController != null) {
+		parent.handleArbiterMsg("shuting down game controller");
+			gameController.shutdown();
+		}
+		if (transport != null) {
+			transport.stop();
+			transport = null;
+		}
+	}
+
+	public void connected(LocalGameController gc) {
+		gameController = gc;
+		gc.connectedTo(this);
 	}
 
 	public void handleColor(GameController gc, int color) {
@@ -90,6 +125,9 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 		} else if (cmd.equals(Protocol.GAME_INFO)) {
 			gameController.gameInfo(s.rest());
 			return;
+		} else if (cmd.equals(Protocol.PONG)) {
+			touchLastPong();
+			return;
 		}
 		protocolFailure("unknown command: '" + cmd + "'");
 	}
@@ -108,8 +146,8 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 			RemoteArbiterTransport t,
 			String s
 			) {
+		shutdown();
 		parent.handleArbiterMsg(s);
-		t.stop();
 	}
 
 	public void handleTransportInfo(RemoteArbiterTransport t, String s) {

@@ -29,15 +29,11 @@ class RemoteArbiterBluetoothTransport
 
 	public void start() {
 		closed = false;
-		parent.handleTransportInfo(this, "starting transport thread...");
 		thread.start();
 	}
 
 	public void stop() {
 		closed = true;
-		try {
-			thread.join();
-		} catch (InterruptedException ie) {}
 	}
 
 	public void run() {
@@ -57,7 +53,7 @@ class RemoteArbiterBluetoothTransport
 					"unknown server"
 					);
 			while (!closed) {
-				receive();
+				poll();
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {}
@@ -112,6 +108,10 @@ class RemoteArbiterBluetoothTransport
 						true
 						);
 
+			if (stream == null) {
+				throw new IOException("couldn't obtain stream");
+			}
+
 		in = stream.openDataInputStream();
 		out = stream.openDataOutputStream();
 
@@ -136,9 +136,21 @@ class RemoteArbiterBluetoothTransport
 		return BLUETOOTH;
 	}
 
+
 	public void protocolFailure(String str) {
 		//TODO: implement me
 		stop();
+	}
+
+	public void poll() throws IOException {
+		receive();
+		if (!parent.isLastPongValid()) {
+			parent.handleTransportDisconnected(this, "ping timeout");
+			return;
+		}
+		if (parent.shouldSentNewPing()) {
+			parent.sentNewPing();
+		}
 	}
 
 	public void handleIncomingCommand(String cmd) {

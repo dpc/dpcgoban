@@ -44,6 +44,14 @@ class RemoteGameControllerBluetoothTransport
 	 */
 	public void poll() throws IOException {
 		receive();
+		if (!parent.isPingValid()) {
+			parent.handleTransportDisconnected(this, "ping timeout");
+			throw new IOException("disconnected");
+		}
+	}
+
+	public GameController gameController() {
+		return parent.gameController();
 	}
 
 	protected void handleIncomingCommand(String str) {

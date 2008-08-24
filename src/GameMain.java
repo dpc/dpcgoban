@@ -87,6 +87,7 @@ public class GameMain extends MIDlet implements CommandListener {
 	 */
 	public void commandAction(Command c, Displayable d) {
 		if (c == goban.exitCmd) {
+			goban.shutdown();
 			destroyApp(false);
 			notifyDestroyed();
 			return;
