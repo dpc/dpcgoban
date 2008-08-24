@@ -110,6 +110,21 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 			String xs = s.next();
 			String ys = s.next();
 			String cs = s.next();
+			String ss = s.next();
+			if (xs.equals("") || ys.equals("") || cs.equals("") || ss.equals("")) {
+				protocolFailure("no enought arguments for cmd: " + cmd);
+				return;
+			}
+			int x = Integer.parseInt(xs);
+			int y = Integer.parseInt(ys);
+			int c = Integer.parseInt(cs);
+			int sss = Integer.parseInt(ss);
+			gameController.placeStone(x, y, c, sss);
+			return;
+		} else if (cmd.equals(Protocol.MOVE)) {
+			String xs = s.next();
+			String ys = s.next();
+			String cs = s.next();
 			if (xs.equals("") || ys.equals("") || cs.equals("")) {
 				protocolFailure("no enought arguments for cmd: " + cmd);
 				return;
@@ -117,7 +132,7 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 			int x = Integer.parseInt(xs);
 			int y = Integer.parseInt(ys);
 			int c = Integer.parseInt(cs);
-			gameController.placeStone(x, y, c);
+			gameController.move(x, y, c);
 			return;
 		} else if (cmd.equals(Protocol.CLEAR_BOARD)) {
 			gameController.clearBoard();

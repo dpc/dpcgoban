@@ -48,12 +48,22 @@ class RemoteGameController
 		this.arbiter = arbiter;
 	}
 
-	public void placeStone(int x, int y, int c) {
+	public void move(int x, int y, int c) {
+		transport.sendMsg(
+				Protocol.MOVE + " "
+				+ String.valueOf(x) + " "
+				+ String.valueOf(y) + " "
+				+ String.valueOf(c)
+				);
+	}
+
+	public void placeStone(int x, int y, int c, int s) {
 		transport.sendMsg(
 				Protocol.PLACE_STONE + " "
 				+ String.valueOf(x) + " "
 				+ String.valueOf(y) + " "
-				+ String.valueOf(c)
+				+ String.valueOf(c) + " "
+				+ String.valueOf(s)
 				);
 	}
 

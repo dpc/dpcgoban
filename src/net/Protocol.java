@@ -10,4 +10,6 @@ class Protocol {
 	static final String CLEAR_BOARD = "clear";
 	static final String GAME_INFO = "info";
 	static final String PONG = "pong";
+	// the move was accepted
+	static final String MOVE = "move";
 }

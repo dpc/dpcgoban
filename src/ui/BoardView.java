@@ -32,6 +32,7 @@ class BoardView extends UIElementCommon {
 	int backgroundColor= 0x0075a11;
 	int whiteStoneColor= 0x0FFFFFF;
 	int blackStoneColor= 0x0000000;
+	int koColor = 0xEF00000;
 
 	/**
 	 * Croshair X in stones.
@@ -146,7 +147,8 @@ class BoardView extends UIElementCommon {
 
 		if (color == Board.COLOR_NOTHING) {
 			drawEmptyStone(x, y, ss);
-		} else if (state == Board.STATE_LAST) {
+		}
+		if (state == Board.STATE_LAST) {
 			int sss = (stoneSize - 1) / 2;
 			sss /= 2;
 			sss *= 2;
@@ -162,6 +164,21 @@ class BoardView extends UIElementCommon {
 					g.setColor(whiteStoneColor);
 					break;
 			}
+			if (sss <= 2) {
+				g.drawLine(cx, cy, cx, cy);
+			} else {
+				g.drawRoundRect(gxx, gyy, sss, sss, sss, sss);
+			}
+		}
+		if (state == Board.STATE_KO) {
+			int sss = (stoneSize - 1) / 3;
+			sss /= 2;
+			sss *= 2;
+			if (sss < 0) { sss = 0; }
+			int gxx = cx - sss / 2;
+			int gyy = cy - sss / 2;
+
+			g.setColor(koColor);
 			if (sss <= 2) {
 				g.drawLine(cx, cy, cx, cy);
 			} else {

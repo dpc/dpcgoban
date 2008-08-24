@@ -1,7 +1,7 @@
-
 import javax.microedition.media.*;
 import java.io.*;
 import javax.microedition.media.control.*;
+import java.util.Random;
 
 /**
  * Internal board representation.
@@ -33,6 +33,8 @@ class Board {
 	protected int lastMoveY = 0;
 
 	protected int colors[][];
+	protected int states[][];
+	Random random = new Random();
 
 	Board(BoardView ui) {
 		setUiBoard(ui);
@@ -44,18 +46,26 @@ class Board {
 		ui.resetBoard(boardSize, ui.getStoneSize());
 
 		colors = new int[boardSize][boardSize];
+		states = new int[boardSize][boardSize];
 	}
 
 	public void makeMoveSound() {
 		try {
-			InputStream is = this.getClass().getResourceAsStream("/move.wav");
+			String file = "move";
+			if (random.nextInt(2) == 0) {
+				file += "1";
+			} else {
+				file += "2";
+			}
+			file += ".wav";
+			InputStream is = this.getClass().getResourceAsStream(file);
 			Player p = Manager.createPlayer(is, "audio/x-wav");
 			p.realize();
 			VolumeControl vc = (VolumeControl) p.getControl("VolumeControl");
 			vc.setLevel(100);
 			p.start();
 		} catch (Exception ex) {
-			//System.out.printnln(ex.getMessage());
+			System.out.println(ex.getMessage());
 		}
 	}
 
@@ -101,7 +111,7 @@ class Board {
 	public void clearBoard() {
 		for (int x = 0; x < boardSize; ++x) {
 			for (int y = 0; y < boardSize; ++y) {
-				placeStone(x, y, COLOR_NOTHING);
+				placeStone(x, y, COLOR_NOTHING, STATE_NORMAL);
 			}
 		}
 	}
@@ -115,30 +125,24 @@ class Board {
 		return state;
 	}
 
-	public void placeStone(int x, int y, int color) {
-		ui.drawStone(x, y, color, getStoneState(x, y));
+	public void placeStone(int x, int y, int color, int state) {
+		ui.drawStone(x, y, color, state);
 		colors[x][y] = color;
+		states[x][y] = state;
 	}
 
-	public void makeMove(int x, int y, int color) {
+	public void move(int x, int y, int color) {
 		makeMoveSound();
-		int lmx = lastMoveX;
-		int lmy = lastMoveY;
-		lastMoveX = x;
-		lastMoveY = y;
-		placeStone(lmx, lmy, colors[lmx][lmy]);
-		placeStone(x, y, color);
 	}
 
 	public void redrawBoard() {
 		for (int x = 0; x < boardSize; ++x) {
 			for (int y = 0; y < boardSize; ++y) {
-				if (colors[x][y] != COLOR_NOTHING) {
-					ui.drawStone(x, y, colors[x][y], getStoneState(x, y));
-				}
+				ui.drawStone(x, y, colors[x][y], states[x][y]);
 			}
 		}
 	}
+
 
 	public int getCrosshairX() {
 		return ui.getCrosshairX();

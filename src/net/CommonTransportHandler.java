@@ -120,10 +120,8 @@ abstract class CommonTransportHandler {
 	 * Must be non-blocking!
 	 */
 	private void sendRaw(String s) throws IOException {
-		System.out.println("W:" + s);
 		out.write(s.getBytes("UTF8"));
 		out.flush();
-		System.out.println("WEND");
 	}
 
 }

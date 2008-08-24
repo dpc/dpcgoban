@@ -183,8 +183,9 @@ class LocalArbiter
 		for (int x = 0; x < boardLogic.getSize(); ++x) {
 			for (int y = 0; y < boardLogic.getSize(); ++y) {
 				int c = boardLogic.getColor(x, y);
+				int s = boardLogic.getState(x, y);
 				if (c != BoardLogic.COLOR_NONE) {
-					gc.placeStone(x, y, c);
+					gc.placeStone(x, y, c, s);
 				}
 			}
 		}
@@ -239,7 +240,7 @@ class LocalArbiter
 	}
 
 	public void handleBoardStoneChange (
-			BoardLogic bl, int x, int y, int color, int status
+			BoardLogic bl, int x, int y, int color, int state
 			)
 	{
 		for (int i = 0; i < connectedControllers.size(); ++i) {
@@ -247,7 +248,19 @@ class LocalArbiter
 					connectedControllers.elementAt(i)
 					);
 			if (gc != null) {
-				gc.placeStone(x, y, color);
+				gc.placeStone(x, y, color, state);
+			}
+		}
+	}
+
+	public void handleMoveCommited(int x, int y, int c)
+	{
+		for (int i = 0; i < connectedControllers.size(); ++i) {
+			GameController gc = (GameController)(
+					connectedControllers.elementAt(i)
+					);
+			if (gc != null) {
+				gc.move(x, y, c);
 			}
 		}
 	}

@@ -290,6 +290,9 @@ public class Goban extends Canvas
 	public void startMusic() {
 		removeCommand(startMusicCmd);
 		addCommand(stopMusicCmd);
+
+		// TODO: below makes OutOfMemoryException
+		/*
 		try
 		{
 			player = Manager.createPlayer(
@@ -304,6 +307,7 @@ public class Goban extends Canvas
 		{
 			System.out.println(e);
 		}
+		*/
 	}
 
 	/**

@@ -25,8 +25,8 @@ class LocalGameController implements GameController {
 		}
 	}
 
-	public void placeStone(int x, int y, int c) {
-		board.placeStone(x, y, c);
+	public void placeStone(int x, int y, int c, int s) {
+		board.placeStone(x, y, c, s);
 	}
 
 	public void clearBoard() {
@@ -49,6 +49,10 @@ class LocalGameController implements GameController {
 		if (arbiter != null) {
 			arbiter.handleColor(this, color);
 		}
+	}
+
+	public void move(int x, int y, int c) {
+		board.move(x, y, c);
 	}
 
 	public void unhandleColor(int color) {

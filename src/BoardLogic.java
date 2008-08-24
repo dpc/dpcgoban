@@ -12,13 +12,16 @@ class BoardLogic {
 	static final int COLOR_WHITE = Board.COLOR_WHITE;
 	static final int COLOR_BLACK = Board.COLOR_BLACK;
 
-	static final int STATE_NORMAL = BoardLogic.STATE_NORMAL;
-	static final int STATE_KO = BoardLogic.STATE_KO;
+	static final int STATE_NORMAL = Board.STATE_NORMAL;
+	static final int STATE_KO = Board.STATE_KO;
+	static final int STATE_LAST = Board.STATE_LAST;
 
 	interface Parent {
 		void handleBoardStoneChange (
 				BoardLogic bl, int x, int y, int color, int status
 				);
+		void handleMoveCommited(int x, int y, int c);
+
 		void handleBoardResize(
 				BoardLogic bl, int new_size
 				);
@@ -29,6 +32,9 @@ class BoardLogic {
 
 	int koX = -1;
 	int koY = -1;
+	int lastX = -1;
+	int lastY = -1;
+	int lastColor = COLOR_BLACK;
 
 	private Group groups[][];
 
@@ -54,6 +60,8 @@ class BoardLogic {
 		parent.handleBoardClear(this);
 		koX = -1;
 		koY = -1;
+		lastX = -1;
+		lastY = -1;
 	}
 
 
@@ -64,12 +72,17 @@ class BoardLogic {
 		return groups[x][y].color;
 	}
 
+	
 	public int getState(int x, int y) {
 		if (x == koX && y == koY) {
 			return STATE_KO;
 		}
+		if (x == lastX && y == lastX) {
+			return STATE_LAST;
+		}
 		return STATE_NORMAL;
 	}
+
 
 	public int getSize() {
 		return groups.length;
@@ -123,15 +136,31 @@ class BoardLogic {
 	}
 	protected void clearKo() {
 		if (koX != -1 && koY != -1) {
-			parent.handleBoardStoneChange(this, koX, koY, COLOR_NONE, STATE_KO);
+			parent.handleBoardStoneChange(this, koX, koY, COLOR_NONE, STATE_NORMAL);
 			koX = -1;
 			koY = -1;
+		}
+	}
+	protected void clearLast() {
+		if (lastX != -1 && lastY != -1) {
+			parent.handleBoardStoneChange(
+					this, lastX, lastY, lastColor, STATE_NORMAL
+					);
+			lastX = -1;
+			lastY = -1;
 		}
 	}
 	protected void setKo(int x, int y) {
 		koX = x;
 		koY = y;
 		parent.handleBoardStoneChange(this, koX, koY, COLOR_NONE, STATE_KO);
+	}
+
+	protected void setLast(int x, int y, int c) {
+		lastX = x;
+		lastY = y;
+		lastColor = c;
+		parent.handleBoardStoneChange(this, x, y, c, STATE_LAST);
 	}
 
 	public void doMove(int x, int y, int color) {
@@ -149,7 +178,7 @@ class BoardLogic {
 		}
 
 		groups[x][y] = new Group();
-		setColor(x, y, color);
+		groups[x][y].color = color;
 
 		if (isSameColor(x, y-1, color)) {
 			joinGroups(x, y, x, y-1);
@@ -170,11 +199,6 @@ class BoardLogic {
 		recountLiberties(x, y);
 	}
 
-	void setColor(int x, int y, int color) {
-		groups[x][y].color = color;
-		parent.handleBoardStoneChange(this, x, y, color, STATE_NORMAL);
-	}
-
 	void takeOneLiberty(int x, int y) {
 		if (--groups[x][y].liberties == 0) {
 			Group toDel = groups[x][y];
@@ -183,7 +207,7 @@ class BoardLogic {
 					if (groups[nx][ny] == toDel) {
 						groups[nx][ny] = null;
 						parent.handleBoardStoneChange(
-								this, nx, ny, COLOR_NONE, STATE_NORMAL
+								this, nx, ny, COLOR_NONE, getState(nx, ny)
 								);
 					}
 				}
@@ -243,7 +267,7 @@ class BoardLogic {
 			isEmpty(x-1, y) || isEmpty(x+1, y)
 			)
 		{
-			clearKo();
+			commitMove(x, y, color);
 			return false;
 		}
 
@@ -254,7 +278,7 @@ class BoardLogic {
 				isSameColorNotInAtari(x+1, y, color)
 		   )
 		{
-			clearKo();
+			commitMove(x, y, color);
 			return false;
 		}
 
@@ -297,8 +321,7 @@ class BoardLogic {
 		}
 
 		if (groupsToKill > 0) {
-			clearKo();
-			
+			commitMove(x, y, color);
 		}
 
 		if (oneStoneGroupsToKill == 1) {
@@ -310,6 +333,16 @@ class BoardLogic {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Triggered as soon as the move is considered valid.
+	 */
+	protected void commitMove(int x, int y, int c) {
+		clearKo();
+		clearLast();
+		setLast(x, y, c);
+		parent.handleMoveCommited(x, y, c);
 	}
 
 	public boolean isEmpty(int x, int y) {
