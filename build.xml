@@ -22,15 +22,12 @@
 
 		<wtkjad jadfile="dpcgoban.jad"
 			jarfile="dpcgoban.jar"
-			name="Hello"
+			name="dpcgoban"
 			vendor="Dawid Ciężarkiewicz"
-			version="1.0.0">
+			version="0.7">
 
 			<midlet name="dpcgoban" class="GameMain"/>
-			<attribute name="ZOO" value="GAR" />
-			<attribute name="FOO" value="BAR" />
-			<attribute name="A" value="1" />
-			<attribute name="URL" value="http://google.com" />
+			<attribute name="URL" value="dpc.wikidto.com/dpcgoban" />
 		</wtkjad>
 
 		<delete dir="classes"/>
