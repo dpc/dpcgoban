@@ -110,7 +110,7 @@ public class Goban extends Canvas
 	/**
 	 * Is timer panel hidden?
 	 */
-	public boolean timerToggled = false;
+	public boolean timerToggled = true;
 
 	/**
 	 * Is chat panel hidden?

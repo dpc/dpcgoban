@@ -15,7 +15,7 @@ class BoardView extends UIElementCommon {
 	/**
 	 * Stone size in pixels.
 	 */
-	int stoneSize = 7;
+	int stoneSize = 11;
 	long lastTime = 0;
 	long firstTime = 0;
 
@@ -69,6 +69,10 @@ class BoardView extends UIElementCommon {
 		super(parent);
 
 		firstTime = System.currentTimeMillis();
+		stoneSize = parent.getXSize() / 22;
+		if (stoneSize % 2 == 0) {
+			stoneSize++;
+		}
 	}
 
 	public void resetBoard(int boardSize, int stoneSize) {
