@@ -64,8 +64,11 @@ class Board {
 			VolumeControl vc = (VolumeControl) p.getControl("VolumeControl");
 			vc.setLevel(100);
 			p.start();
+			is.close();
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
+		} catch (OutOfMemoryError e) {
+			System.out.println(e.getMessage());
 		}
 	}
 

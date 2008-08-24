@@ -164,6 +164,16 @@ class BoardLogic {
 	}
 
 	public void doMove(int x, int y, int color) {
+		groups[x][y] = new Group();
+		groups[x][y].color = color;
+		setLast(x, y, color);
+		parent.handleMoveCommited(x, y, color);
+
+		// TODO: this part is lame
+		// recounting liberties each time
+		// sucks, but just decrasing it
+		// int takeOneLiberty is vulearable
+		// to double liberty taking problem
 		if (isOtherColor(x, y-1, color)) {
 			takeOneLiberty(x, y-1);
 		}
@@ -177,21 +187,15 @@ class BoardLogic {
 			takeOneLiberty(x+1, y);
 		}
 
-		groups[x][y] = new Group();
-		groups[x][y].color = color;
-
 		if (isSameColor(x, y-1, color)) {
 			joinGroups(x, y, x, y-1);
 		}
-
 		if (isSameColor(x, y+1, color)) {
 			joinGroups(x, y, x, y+1);
 		}
-
 		if (isSameColor(x+1, y, color)) {
 			joinGroups(x, y, x+1, y);
 		}
-
 		if (isSameColor(x-1, y, color)) {
 			joinGroups(x, y, x-1, y);
 		}
@@ -200,15 +204,47 @@ class BoardLogic {
 	}
 
 	void takeOneLiberty(int x, int y) {
-		if (--groups[x][y].liberties == 0) {
-			Group toDel = groups[x][y];
-			for (int nx = 0; nx < getSize(); ++nx) {
-				for (int ny = 0; ny < getSize(); ++ny) {
-					if (groups[nx][ny] == toDel) {
-						groups[nx][ny] = null;
-						parent.handleBoardStoneChange(
-								this, nx, ny, COLOR_NONE, getState(nx, ny)
-								);
+		recountLiberties(x, y);
+		if (groups[x][y].liberties == 0) {
+			removeGroup(x, y);
+		}
+	}
+
+	protected void removeGroup(int x, int y) {
+		Group toDel = groups[x][y];
+		int c = groups[x][y].color;
+		for (int nx = 0; nx < getSize(); ++nx) {
+			for (int ny = 0; ny < getSize(); ++ny) {
+				if (groups[nx][ny] == toDel) {
+					groups[nx][ny] = null;
+					parent.handleBoardStoneChange(
+							this, nx, ny, COLOR_NONE, getState(nx, ny)
+							);
+					if (isOtherColor(nx - 1, ny, c)) {
+						groups[nx - 1][ny].needsRecount = true;
+					}
+					if (isOtherColor(nx + 1, ny, c)) {
+						groups[nx + 1][ny].needsRecount = true;
+					}
+					if (isOtherColor(nx , ny -1, c)) {
+						groups[nx][ny -1].needsRecount = true;
+					}
+					if (isOtherColor(nx, ny + 1, c)) {
+						groups[nx][ny + 1].needsRecount = true;
+					}
+				}
+			}
+		}
+		recountMarkedLiberties();
+	}
+
+	protected void recountMarkedLiberties() {
+		for (int nx = 0; nx < getSize(); ++nx) {
+			for (int ny = 0; ny < getSize(); ++ny) {
+				if (groups[nx][ny] != null) {
+					if (groups[nx][ny].needsRecount) {
+						groups[nx][ny].needsRecount = false;
+						recountLiberties(nx, ny);
 					}
 				}
 			}
@@ -289,7 +325,7 @@ class BoardLogic {
 
 		if (isOtherColorInAtari(x, y-1, color)) {
 			groupsToKill++;
-			if (groups[x][y-1].liberties == 1) {
+			if (isSingleStone(x, y-1)) {
 				oneStoneGroupsToKillX = x;
 				oneStoneGroupsToKillY = y-1;
 				oneStoneGroupsToKill++;
@@ -297,7 +333,7 @@ class BoardLogic {
 		}
 		if (isOtherColorInAtari(x, y+1, color)) {
 			groupsToKill++;
-			if (groups[x][y+1].liberties == 1) {
+			if (isSingleStone(x, y+1)) {
 				oneStoneGroupsToKillX = x;
 				oneStoneGroupsToKillY = y+1;
 				oneStoneGroupsToKill++;
@@ -305,7 +341,7 @@ class BoardLogic {
 		}
 		if (isOtherColorInAtari(x-1, y, color)) {
 			groupsToKill++;
-			if (groups[x-1][y].liberties == 1) {
+			if (isSingleStone(x-1, y)) {
 				oneStoneGroupsToKillX = x-1;
 				oneStoneGroupsToKillY = y;
 				oneStoneGroupsToKill++;
@@ -313,7 +349,7 @@ class BoardLogic {
 		}
 		if (isOtherColorInAtari(x+1, y, color)) {
 			groupsToKill++;
-			if (groups[x+1][y].liberties == 1) {
+			if (isSingleStone(x+1, y)) {
 				oneStoneGroupsToKillX = x+1;
 				oneStoneGroupsToKillY = y;
 				oneStoneGroupsToKill++;
@@ -335,14 +371,38 @@ class BoardLogic {
 		return true;
 	}
 
+	protected boolean isSingleStone(int x, int y) {
+		if (isOutOfTheBoard(x, y)) {
+			return false;
+		}
+
+		if (groups[x][y] == null) {
+			return false;
+		}
+		int c = groups[x][y].color;
+
+		if (isSameColor(x - 1, y, c)) {
+			return false;
+		}
+		if (isSameColor(x + 1, y, c)) {
+			return false;
+		}
+		if (isSameColor(x, y - 1, c)) {
+			return false;
+		}
+		if (isSameColor(x, y + 1, c)) {
+			return false;
+		}
+		return true;
+	}
+
+
 	/**
 	 * Triggered as soon as the move is considered valid.
 	 */
 	protected void commitMove(int x, int y, int c) {
 		clearKo();
 		clearLast();
-		setLast(x, y, c);
-		parent.handleMoveCommited(x, y, c);
 	}
 
 	public boolean isEmpty(int x, int y) {
@@ -408,5 +468,6 @@ class BoardLogic {
 	protected class Group {
 		public int liberties;
 		public int color;
+		public boolean needsRecount;
 	}
 }
