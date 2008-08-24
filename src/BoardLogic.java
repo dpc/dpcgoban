@@ -13,6 +13,7 @@ class BoardLogic {
 	static final int COLOR_BLACK = Board.COLOR_BLACK;
 
 	static final int STATE_NORMAL = BoardLogic.STATE_NORMAL;
+	static final int STATE_KO = BoardLogic.STATE_KO;
 
 	interface Parent {
 		void handleBoardStoneChange (
@@ -25,6 +26,9 @@ class BoardLogic {
 				BoardLogic bl
 				);
 	}
+
+	int koX = -1;
+	int koY = -1;
 
 	private Group groups[][];
 
@@ -48,6 +52,8 @@ class BoardLogic {
 			}
 		}
 		parent.handleBoardClear(this);
+		koX = -1;
+		koY = -1;
 	}
 
 
@@ -59,6 +65,9 @@ class BoardLogic {
 	}
 
 	public int getState(int x, int y) {
+		if (x == koX && y == koY) {
+			return STATE_KO;
+		}
 		return STATE_NORMAL;
 	}
 
@@ -72,10 +81,11 @@ class BoardLogic {
 			throw new InvalidArgumentException("already occupied");
 		}
 
+		if (x == koX && y == koY) {
+			throw new InvalidArgumentException("ko");
+		}
 
-		// TODO: check for KO here
-
-		if (isSuicide(x, y, color)) {
+		if (checkSuicide(x, y, color)) {
 			throw new InvalidArgumentException("suicidal");
 		}
 
@@ -110,6 +120,18 @@ class BoardLogic {
 		}
 
 		return false;
+	}
+	protected void clearKo() {
+		if (koX != -1 && koY != -1) {
+			parent.handleBoardStoneChange(this, koX, koY, COLOR_NONE, STATE_KO);
+			koX = -1;
+			koY = -1;
+		}
+	}
+	protected void setKo(int x, int y) {
+		koX = x;
+		koY = y;
+		parent.handleBoardStoneChange(this, koX, koY, COLOR_NONE, STATE_KO);
 	}
 
 	public void doMove(int x, int y, int color) {
@@ -215,22 +237,13 @@ class BoardLogic {
 		}
 	}
 	
-	public boolean isSuicide(int x, int y, int color) {
+	public boolean checkSuicide(int x, int y, int color) {
 		if (
 			isEmpty(x, y-1) || isEmpty(x, y+1) ||
 			isEmpty(x-1, y) || isEmpty(x+1, y)
 			)
 		{
-			return false;
-		}
-
-		if (
-			isOtherColorInAtari(x, y-1, color) ||
-			isOtherColorInAtari(x, y+1, color) ||
-			isOtherColorInAtari(x-1, y, color) ||
-			isOtherColorInAtari(x+1, y, color)
-		   )
-		{
+			clearKo();
 			return false;
 		}
 
@@ -241,8 +254,61 @@ class BoardLogic {
 				isSameColorNotInAtari(x+1, y, color)
 		   )
 		{
+			clearKo();
 			return false;
 		}
+
+		int groupsToKill = 0;
+		int oneStoneGroupsToKill = 0;
+		int oneStoneGroupsToKillX = -1;
+		int oneStoneGroupsToKillY = -1;
+
+		if (isOtherColorInAtari(x, y-1, color)) {
+			groupsToKill++;
+			if (groups[x][y-1].liberties == 1) {
+				oneStoneGroupsToKillX = x;
+				oneStoneGroupsToKillY = y-1;
+				oneStoneGroupsToKill++;
+			}
+		}
+		if (isOtherColorInAtari(x, y+1, color)) {
+			groupsToKill++;
+			if (groups[x][y+1].liberties == 1) {
+				oneStoneGroupsToKillX = x;
+				oneStoneGroupsToKillY = y+1;
+				oneStoneGroupsToKill++;
+			}
+		}
+		if (isOtherColorInAtari(x-1, y, color)) {
+			groupsToKill++;
+			if (groups[x-1][y].liberties == 1) {
+				oneStoneGroupsToKillX = x-1;
+				oneStoneGroupsToKillY = y;
+				oneStoneGroupsToKill++;
+			}
+		}
+		if (isOtherColorInAtari(x+1, y, color)) {
+			groupsToKill++;
+			if (groups[x+1][y].liberties == 1) {
+				oneStoneGroupsToKillX = x+1;
+				oneStoneGroupsToKillY = y;
+				oneStoneGroupsToKill++;
+			}
+		}
+
+		if (groupsToKill > 0) {
+			clearKo();
+			
+		}
+
+		if (oneStoneGroupsToKill == 1) {
+			setKo(oneStoneGroupsToKillX, oneStoneGroupsToKillY);
+		}
+
+		if (groupsToKill > 0) {
+			return false;
+		}
+
 		return true;
 	}
 
