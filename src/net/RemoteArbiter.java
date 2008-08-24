@@ -43,11 +43,11 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 	}
 
 	public boolean isLastPongValid() {
-		return ((lastPing - lastPong) < 1000 * 5);
+		return ((lastPing - lastPong) < 1000 * 3);
 	}
 
 	public boolean shouldSentNewPing() {
-		return (System.currentTimeMillis() > (lastPing + 1000 * 10));
+		return (System.currentTimeMillis() > (lastPing + 1000 * 2));
 	}
 
 	public void sentNewPing() {
