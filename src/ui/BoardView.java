@@ -66,9 +66,12 @@ class BoardView extends UIElementCommon {
 	 * Ctor.
 	 */
 	public BoardView(Parent parent) {
-		super(parent);
-
 		firstTime = System.currentTimeMillis();
+		super(parent);
+		setAutoCellSize();
+	}
+	
+	protected void setAutoCellSize() {
 		stoneSize = parent.getXSize() / 22;
 		if (stoneSize % 2 == 0) {
 			stoneSize++;
@@ -76,7 +79,6 @@ class BoardView extends UIElementCommon {
 	}
 
 	public void resetBoard(int boardSize, int stoneSize) {
-		markDirty();
 
 		int oldcx = getStoneX(cx);
 		int oldcy = getStoneY(cy);
@@ -90,6 +92,8 @@ class BoardView extends UIElementCommon {
 		drawEmptyBoard();
 		int c = boardSize / 2;
 		setCrosshairPosition(c, c);
+
+		markDirty();
 	}
 
 	public void drawEmptyStone(int x, int y, int ss) {
