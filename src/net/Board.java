@@ -37,6 +37,7 @@ class Board {
 	Random random = new Random();
 
 	Board(BoardView ui) {
+		moveSounds = new Player[MAX_MOVE_SOUNDS];
 		setUiBoard(ui);
 		clearBoard();
 	}
@@ -49,22 +50,25 @@ class Board {
 		states = new int[boardSize][boardSize];
 	}
 
+	protected static final int MAX_MOVE_SOUNDS = 2;
+	protected Player moveSounds[];
 	public void makeMoveSound() {
 		try {
-			String file = "move";
-			if (random.nextInt(2) == 0) {
-				file += "1";
-			} else {
-				file += "2";
+			int i = random.nextInt(MAX_MOVE_SOUNDS);
+			
+			if (moveSounds[i] == null) {
+				String file = "move" + String.valueOf(i + 1) + ".wav";
+				InputStream is = this.getClass().getResourceAsStream(file);
+				Player p = Manager.createPlayer(is, "audio/x-wav");
+				p.realize();
+				VolumeControl vc = (VolumeControl) p.getControl("VolumeControl");
+				vc.setLevel(100);
+				moveSounds[i] = p;
 			}
-			file += ".wav";
-			InputStream is = this.getClass().getResourceAsStream(file);
-			Player p = Manager.createPlayer(is, "audio/x-wav");
-			p.realize();
-			VolumeControl vc = (VolumeControl) p.getControl("VolumeControl");
-			vc.setLevel(100);
-			p.start();
-			is.close();
+
+			if (moveSounds[i] != null) {
+				moveSounds[i].start();
+			}
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 		} catch (OutOfMemoryError e) {
