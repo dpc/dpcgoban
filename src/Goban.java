@@ -398,7 +398,9 @@ public class Goban extends Canvas
 	}
 
 	public void passReq() {
-		gameController.passRequest();
+		if (gameController != null) {
+			gameController.passRequest();
+		}
 	}
 
 	/**
