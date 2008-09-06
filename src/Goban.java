@@ -255,6 +255,7 @@ public class Goban extends Canvas
 		logView.appendString(" - zoom goban in/out (model dependent)");
 		logView.appendString("");
 		logView.appendString("more info: http://dpc.wikidot.com/lab:dpcgoban");
+		logView.appendString("");
 	}
 
 	/**
