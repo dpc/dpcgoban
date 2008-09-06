@@ -120,6 +120,7 @@ public class Goban extends Canvas
 	 */
 	private Intro demo;
 
+	protected boolean fullSizeLogMode = false;
 
 	/**
 	 * Is timer panel hidden?
@@ -140,12 +141,12 @@ public class Goban extends Canvas
 	 * Ctor.
 	 */
 	public Goban() {
-		logView.appendString("Welcome in DPC Goban!");
-		logView.appendString(
-				"Connect to or host a game to start. "
-				+ "Use help to see list of available shortcuts."
-				);
 		logView.appendString("---");
+		logView.appendString("Welcome in DPC Goban!");
+		logView.appendString("---");
+		logView.appendString(
+				"Use menu help option"
+				);
 
 		addCommand(skipIntroCmd);
 
@@ -241,13 +242,19 @@ public class Goban extends Canvas
 	 * Print basic user help.
 	 */
 	public void printUIHelp() {
+		fullSizeLogMode = true;
+		repaintUI();
+		logView.appendString("");
+		logView.appendString("Welcome in DPC Goban!");
+		logView.appendString("");
 		logView.appendString("To start/join a game use menu commands.");
 		logView.appendString("When in active game you can:");
 		logView.appendString(" - move (arrows)");
 		logView.appendString(" - place stone (action button)");
 		logView.appendString(" - toggle log visibility (model dependent)");
-		logView.appendString(" - zoom view in/out (model dependent)");
-		logView.appendString("more help: http://dpc.wikidot.com/lab:dpcgoban");
+		logView.appendString(" - zoom goban in/out (model dependent)");
+		logView.appendString("");
+		logView.appendString("more info: http://dpc.wikidot.com/lab:dpcgoban");
 	}
 
 	/**
@@ -354,9 +361,15 @@ public class Goban extends Canvas
 	 * Handle key presses.
 	 */
 	public void keyPressed(int keycode) {
+		if (fullSizeLogMode) {
+			fullSizeLogMode = false;
+			repaintUI();
+		}
+
 		if (board == null) {
 			return;
 		}
+
 
 		switch (getGameAction(keycode)) {
 			case UP:
@@ -382,8 +395,8 @@ public class Goban extends Canvas
 				repaintUI();
 				break;
 			case GAME_D:
-				//timerToggled = !timerToggled;
-				//repaintUI();
+				fullSizeLogMode = true;
+				repaintUI();
 				break;
 			case FIRE:
 				moveReq();
@@ -440,6 +453,10 @@ public class Goban extends Canvas
 	 * Current screen division point y-coordinated.
 	 */
 	public int getYDiv() {
+		if (fullSizeLogMode) {
+			return 0;
+		}
+
 		if (chatToggled) {
 			return getHeight();
 		}

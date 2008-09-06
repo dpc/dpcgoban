@@ -27,7 +27,7 @@ class LogView extends UIElementCommon {
 
 		chatImage = Image.createImage(
 			parent.getXSize(),
-			parent.getYSize() - parent.getYDivOn()
+			parent.getYSize()
 			);
 	}
 
@@ -80,6 +80,6 @@ class LogView extends UIElementCommon {
 
 	protected void repaint(Graphics g) {
 		g.setClip(0, parent.getYDiv(), parent.getXSize(), parent.getYSize());
-		g.drawImage(chatImage, 0, parent.getYDiv(), Graphics.TOP|Graphics.LEFT);
+		g.drawImage(chatImage, 0, 0, Graphics.TOP|Graphics.LEFT);
 	}
 }
