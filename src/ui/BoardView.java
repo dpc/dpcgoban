@@ -66,8 +66,8 @@ class BoardView extends UIElementCommon {
 	 * Ctor.
 	 */
 	public BoardView(Parent parent) {
-		firstTime = System.currentTimeMillis();
 		super(parent);
+		firstTime = System.currentTimeMillis();
 		setAutoCellSize();
 	}
 	
