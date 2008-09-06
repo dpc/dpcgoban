@@ -297,9 +297,9 @@ public class Goban extends Canvas
 			player = Manager.createPlayer(
 				getClass().getResourceAsStream("/intro.midi"), "audio/midi"
 				);
-			// TODO: XXX: FIXME: setting volume makes player silent
-			//VolumeControl vc = (VolumeControl) player.getControl("VolumeControl");
-			//vc.setLevel(100);
+			player.realize();
+			VolumeControl vc = (VolumeControl) player.getControl("VolumeControl");
+			vc.setLevel(5);
 			player.start();
 		}
 		catch (Exception e)
