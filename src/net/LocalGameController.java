@@ -25,6 +25,12 @@ class LocalGameController implements GameController {
 		}
 	}
 
+	public void passRequest() {
+		if (arbiter != null) {
+			arbiter.passRequest(this);
+		}
+	}
+
 	public void placeStone(int x, int y, int c, int s) {
 		board.placeStone(x, y, c, s);
 	}
@@ -53,6 +59,10 @@ class LocalGameController implements GameController {
 
 	public void move(int x, int y, int c) {
 		board.move(x, y, c);
+	}
+
+	public void pass(int c) {
+		board.pass();
 	}
 
 	public void unhandleColor(int color) {

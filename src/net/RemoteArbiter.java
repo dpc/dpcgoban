@@ -94,6 +94,12 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 				);
 	}
 
+	public void passRequest(GameController gc) {
+		transport.sendMsg(
+				Protocol.PASS_REQUEST
+				);
+	}
+
 	/**
 	 * Analyze the message that comes from transport.
 	 *
@@ -139,6 +145,15 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 			return;
 		} else if (cmd.equals(Protocol.GAME_INFO)) {
 			gameController.gameInfo(s.rest());
+			return;
+		} else if (cmd.equals(Protocol.PASS)) {
+			String cs = s.next();
+			if (cs.equals("")) {
+				protocolFailure("no enought arguments for cmd: " + cmd);
+				return;
+			}
+			int c = Integer.parseInt(cs);
+			gameController.pass(c);
 			return;
 		} else if (cmd.equals(Protocol.PONG)) {
 			touchLastPong();

@@ -48,6 +48,13 @@ class RemoteGameController
 		this.arbiter = arbiter;
 	}
 
+	public void pass(int c) {
+		transport.sendMsg(
+				Protocol.PASS + " "
+				+ String.valueOf(c)
+				);
+	}
+
 	public void move(int x, int y, int c) {
 		transport.sendMsg(
 				Protocol.MOVE + " "
@@ -128,6 +135,12 @@ class RemoteGameController
 			} else {
 				arbiter.unhandleColor(this, c);
 			}
+			return;
+		} else if (
+				cmd.equals(Protocol.PASS_REQUEST)
+				)
+		{
+			arbiter.passRequest(this);
 			return;
 		} else if (
 				cmd.equals(Protocol.PING)

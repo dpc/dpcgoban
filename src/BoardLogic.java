@@ -21,6 +21,7 @@ class BoardLogic {
 				BoardLogic bl, int x, int y, int color, int status
 				);
 		void handleMoveCommited(int x, int y, int c);
+		void handlePassCommited(int c);
 
 		void handleBoardResize(
 				BoardLogic bl, int new_size
@@ -88,8 +89,17 @@ class BoardLogic {
 		return groups.length;
 	}
 
+	public void passRequest(int color)
+		throws InvalidArgumentException {
+
+		clearKo();
+		clearLast();
+
+		parent.handlePassCommited(color);
+	}
+
 	public void moveRequest(int x, int y, int color)
-	throws InvalidArgumentException {
+		throws InvalidArgumentException {
 		if (getColor(x, y) != COLOR_NONE) {
 			throw new InvalidArgumentException("already occupied");
 		}

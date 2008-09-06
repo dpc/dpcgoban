@@ -23,4 +23,5 @@ interface Arbiter {
 	 * Request from GC to make a move.
 	 */
 	public void moveRequest(GameController gc, int x, int y);
+	public void passRequest(GameController gc);
 }

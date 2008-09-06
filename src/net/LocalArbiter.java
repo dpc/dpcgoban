@@ -142,35 +142,61 @@ class LocalArbiter
 		}
 	}
 
-	public void moveRequest(GameController gcx, int x, int y) {
+	protected boolean checkMoveConditions(GameController gcx) {
 		if (whiteController == null || blackController == null) {
 			gcx.gameInfo("both colors need to be occupied");
-			return;
+			return false;
 		}
 
 		if (gcx == whiteController && gcx == blackController) {
 		} else if (gcx == whiteController) {
 			if (nextMoveColor != BoardLogic.COLOR_WHITE) {
 				gcx.gameInfo("not your turn");
-				return;
+				return false;
 			}
 		} else if (gcx == blackController) {
 			if (nextMoveColor != BoardLogic.COLOR_BLACK) {
 				gcx.gameInfo("not your turn");
-				return;
+				return false;
 			}
 		} else {
 			gcx.gameInfo("pick your side first");
+			return false;
+		}
+		return true;
+	}
+
+	protected void switchCurrentColor() {
+		if (nextMoveColor == BoardLogic.COLOR_BLACK) {
+			nextMoveColor = BoardLogic.COLOR_WHITE;
+		} else {
+			nextMoveColor = BoardLogic.COLOR_BLACK;
+		}
+	}
+
+	public void passRequest(GameController gcx) {
+		if (!checkMoveConditions(gcx)) {
+			return;
+		}
+
+		try {
+			boardLogic.passRequest(nextMoveColor);
+			switchCurrentColor();
+		} catch (InvalidArgumentException e) {
+			gcx.gameInfo("illegal move");
+		}
+	}
+
+
+	public void moveRequest(GameController gcx, int x, int y) {
+
+		if (!checkMoveConditions(gcx)) {
 			return;
 		}
 
 		try {
 			boardLogic.moveRequest(x, y, nextMoveColor);
-			if (nextMoveColor == BoardLogic.COLOR_BLACK) {
-				nextMoveColor = BoardLogic.COLOR_WHITE;
-			} else {
-				nextMoveColor = BoardLogic.COLOR_BLACK;
-			}
+			switchCurrentColor();
 		} catch (InvalidArgumentException e) {
 			gcx.gameInfo("illegal move");
 		}
@@ -260,6 +286,18 @@ class LocalArbiter
 					);
 			if (gc != null) {
 				gc.move(x, y, c);
+			}
+		}
+	}
+
+	public void handlePassCommited(int c)
+	{
+		for (int i = 0; i < connectedControllers.size(); ++i) {
+			GameController gc = (GameController)(
+					connectedControllers.elementAt(i)
+					);
+			if (gc != null) {
+				gc.pass(c);
 			}
 		}
 	}

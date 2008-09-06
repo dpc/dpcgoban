@@ -141,6 +141,9 @@ class Board {
 	public void move(int x, int y, int color) {
 		makeMoveSound();
 	}
+	public void pass() {
+		makeMoveSound();
+	}
 
 	public void redrawBoard() {
 		for (int x = 0; x < boardSize; ++x) {

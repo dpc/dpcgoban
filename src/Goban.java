@@ -41,6 +41,11 @@ public class Goban extends Canvas
 	public Command skipIntroCmd = new Command("Skip", Command.BACK, 99);
 
 	/**
+	 * Command event when skip intro was requested.
+	 */
+	public Command passReqCmd = new Command("Pass move", Command.SCREEN, 2);
+
+	/**
 	 * Element of UI for board display.
 	 */
 	public BoardView boardView = new BoardView(this);
@@ -285,6 +290,7 @@ public class Goban extends Canvas
 		removeCommand(skipIntroCmd);
 		addCommand(exitCmd);
 		addCommand(moveReqCmd);
+		addCommand(passReqCmd);
 		addCommand(playWhiteCmd);
 		addCommand(playBlackCmd);
 		addCommand(beServerCmd);
@@ -390,6 +396,11 @@ public class Goban extends Canvas
 			gameController.moveRequest();
 		}
 	}
+
+	public void passReq() {
+		gameController.passRequest();
+	}
+
 	/**
 	 * Is game currently active.
 	 */

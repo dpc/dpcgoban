@@ -1,6 +1,7 @@
 class Protocol {
 	// GameController can send:
 	static final String MOVE_REQUEST = "move";
+	static final String PASS_REQUEST = "pass";
 	static final String HANDLE_COLOR = "handle";
 	static final String UNHANDLE_COLOR = "unhandle";
 	static final String PING = "ping";
@@ -12,4 +13,5 @@ class Protocol {
 	static final String PONG = "pong";
 	// the move was accepted
 	static final String MOVE = "move";
+	static final String PASS = "pass";
 }
