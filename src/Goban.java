@@ -423,9 +423,12 @@ public class Goban extends Canvas
 		if (chatToggled) {
 			return getHeight();
 		}
-		return getHeight() * 2 / 3;
+		return getYDivOn();
 	}
 
+	public int getYDivOn() {
+		return getHeight() * 2 / 3;
+	}
 	/**
 	 * Screen X size.
 	 */

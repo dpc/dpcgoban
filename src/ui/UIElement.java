@@ -15,8 +15,9 @@ interface UIElement {
 	interface Parent {
 		public int getXDiv();
 		public int getYDiv();
-		public int getXSize();
+		public int getYDivOn();
 		public int getYSize();
+		public int getXSize();
 		public boolean isActive();
 	}
 

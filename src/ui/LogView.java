@@ -27,7 +27,7 @@ class LogView extends UIElementCommon {
 
 		chatImage = Image.createImage(
 			parent.getXSize(),
-			parent.getYSize() - parent.getYDiv()
+			parent.getYSize() - parent.getYDivOn()
 			);
 	}
 
@@ -41,15 +41,8 @@ class LogView extends UIElementCommon {
 			return;
 		}
 		for (int l = str.length(); l > 0; --l) {
-			// FIXME: WTF?! WHY THIS IS NOT WORKING?
-			//if (logFont.substringWidth(str, 0, l) < parent.getXSize()) {
-			// WORKAROUND: - count one pixel spaces manually
-			if (logFont.substringWidth(str, 0, l) < parent.getXSize() - l) {
+			if (logFont.substringWidth(str, 0, l) < parent.getXSize()) {
 				drawString(str.substring(0, l));
-				// DEBUG:
-				/*drawString(String.valueOf(l) + " : "
-						+ String.valueOf(logFont.substringWidth(str, 0, l))
-						+ " : " + String.valueOf(parent.getXSize()));*/
 				appendString(str.substring(l, str.length()));
 				return;
 			}
@@ -77,6 +70,7 @@ class LogView extends UIElementCommon {
 			chatImage.getWidth(), chatImage.getHeight()
 			);
 		g.setColor(0x0000040);
+		g.setFont(logFont);
 		g.drawString(
 			str,
 			0, chatImage.getHeight(), Graphics.BOTTOM | Graphics.LEFT
