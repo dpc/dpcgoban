@@ -24,17 +24,21 @@ public class Goban extends Canvas
 	/**
 	 * Stop playing music command.
 	 */
-	public Command stopMusicCmd = new Command("Stop music", Command.BACK, 41);
+	public Command stopMusicCmd = new Command(
+			"Stop music", Command.SCREEN, 41
+			);
 
 	/**
 	 * Start playing music command.
 	 */
-	public Command startMusicCmd = new Command("Start music", Command.BACK, 41);
+	public Command startMusicCmd = new Command(
+			"Start music", Command.SCREEN, 41
+			);
 
 	/**
 	 * Command event when skip intro was requested.
 	 */
-	public Command skipIntroCmd = new Command("Skip", Command.SCREEN, 99);
+	public Command skipIntroCmd = new Command("Skip", Command.BACK, 99);
 
 	/**
 	 * Element of UI for board display.
@@ -67,7 +71,12 @@ public class Goban extends Canvas
 	/**
 	 * Help request command.
 	 */
-	public Command printHelpCmd = new Command("Print help", Command.SCREEN, 1);
+	public Command printHelpCmd = new Command("Print help", Command.SCREEN, 2);
+
+	/**
+	 * Help request command.
+	 */
+	public Command moveReqCmd = new Command("Move", Command.SCREEN, 1);
 
 	/**
 	 * Music player.
@@ -268,6 +277,7 @@ public class Goban extends Canvas
 	public void skipIntro() {
 		removeCommand(skipIntroCmd);
 		addCommand(exitCmd);
+		addCommand(moveReqCmd);
 		addCommand(playWhiteCmd);
 		addCommand(playBlackCmd);
 		addCommand(beServerCmd);
@@ -299,7 +309,7 @@ public class Goban extends Canvas
 				);
 			player.realize();
 			VolumeControl vc = (VolumeControl) player.getControl("VolumeControl");
-			vc.setLevel(5);
+			vc.setLevel(10);
 			player.start();
 		}
 		catch (Exception e)
@@ -363,14 +373,16 @@ public class Goban extends Canvas
 				repaintUI();
 				break;
 			case FIRE:
-				if (gameController != null) {
-					gameController.moveRequest();
-				}
+				moveReq();
 				break;
-
 		}
 	}
 
+	public void moveReq() {
+		if (gameController != null) {
+			gameController.moveRequest();
+		}
+	}
 	/**
 	 * Is game currently active.
 	 */
@@ -411,7 +423,7 @@ public class Goban extends Canvas
 		if (chatToggled) {
 			return getHeight();
 		}
-		return getHeight() * 5 / 6;
+		return getHeight() * 2 / 3;
 	}
 
 	/**

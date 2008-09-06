@@ -93,6 +93,8 @@ public class GameMain extends MIDlet implements CommandListener {
 			return;
 		} else if (c == goban.skipIntroCmd) {
 			goban.skipIntro();
+		} else if (c == goban.moveReqCmd) {
+			goban.moveReq();
 		} else if (c == goban.beServerCmd) {
 			goban.beServer();
 		} else if (c == goban.beClientCmd) {

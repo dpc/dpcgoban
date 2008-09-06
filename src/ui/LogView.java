@@ -33,15 +33,23 @@ class LogView extends UIElementCommon {
 
 	/**
 	 * Append string to log.
+	 *
+	 * FIX: binary search would be soo much better...
 	 */
 	public synchronized void appendString(String str) {
-		Font f = logFont;
 		if (str.length() == 0) {
 			return;
 		}
 		for (int l = str.length(); l > 0; --l) {
-			if (f.stringWidth(str.substring(0, l)) < parent.getXSize()) {
+			// FIXME: WTF?! WHY THIS IS NOT WORKING?
+			//if (logFont.substringWidth(str, 0, l) < parent.getXSize()) {
+			// WORKAROUND: - count one pixel spaces manually
+			if (logFont.substringWidth(str, 0, l) < parent.getXSize() - l) {
 				drawString(str.substring(0, l));
+				// DEBUG:
+				/*drawString(String.valueOf(l) + " : "
+						+ String.valueOf(logFont.substringWidth(str, 0, l))
+						+ " : " + String.valueOf(parent.getXSize()));*/
 				appendString(str.substring(l, str.length()));
 				return;
 			}
@@ -56,17 +64,16 @@ class LogView extends UIElementCommon {
 	 */
 	protected void drawString(String str) {
 		Graphics g = chatImage.getGraphics();
-		Font f = logFont;
 
 		g.copyArea(
-			0, f.getHeight(),
-			chatImage.getWidth(), chatImage.getHeight() - f.getHeight(),
+			0, logFont.getHeight(),
+			chatImage.getWidth(), chatImage.getHeight() - logFont.getHeight(),
 			0, 0,
 			Graphics.TOP | Graphics.LEFT
 			);
 		g.setColor(0x0f0f0f0);
 		g.fillRect(
-			0, chatImage.getHeight() - f.getHeight(),
+			0, chatImage.getHeight() - logFont.getHeight(),
 			chatImage.getWidth(), chatImage.getHeight()
 			);
 		g.setColor(0x0000040);
@@ -78,7 +85,7 @@ class LogView extends UIElementCommon {
 	}
 
 	protected void repaint(Graphics g) {
-		g.setClip(0, parent.getYDiv(), parent.getXSize(), parent.getYDiv());
+		g.setClip(0, parent.getYDiv(), parent.getXSize(), parent.getYSize());
 		g.drawImage(chatImage, 0, parent.getYDiv(), Graphics.TOP|Graphics.LEFT);
 	}
 }
