@@ -79,11 +79,11 @@ class LocalArbiter
 
 		if (whiteController == gc) {
 			whiteController = null;
-			gameInfo("white are now free to play");
+			gameInfo("white color is now free");
 		}
 		if (blackController == gc) {
 			blackController = null;
-			gameInfo("black are now free to play");
+			gameInfo("black color is now free");
 		}
 		gc.shutdown();
 	}
@@ -143,7 +143,6 @@ class LocalArbiter
 	}
 
 	public void moveRequest(GameController gcx, int x, int y) {
-
 		if (whiteController == null || blackController == null) {
 			gcx.gameInfo("both colors need to be occupied");
 			return;
@@ -161,7 +160,7 @@ class LocalArbiter
 				return;
 			}
 		} else {
-			gcx.gameInfo("you are only a observer");
+			gcx.gameInfo("pick your side first");
 			return;
 		}
 
@@ -173,7 +172,7 @@ class LocalArbiter
 				nextMoveColor = BoardLogic.COLOR_BLACK;
 			}
 		} catch (InvalidArgumentException e) {
-			gcx.gameInfo("invalid move");
+			gcx.gameInfo("illegal move");
 		}
 	}
 
@@ -222,7 +221,7 @@ class LocalArbiter
 	public void handleControllerTransportConnected(
 			RemoteGameControllerTransport transport
 			) {
-		parent.handleArbiterMsg("new client connection");
+		parent.handleArbiterMsg("new client connected");
 		poller.registerNewRemoteGameControllerTransport(
 				transport
 				);
@@ -230,7 +229,7 @@ class LocalArbiter
 	}
 
 	public void handleControllerDisconnected(RemoteGameController c) {
-		parent.handleArbiterMsg("client disconnected connection");
+		parent.handleArbiterMsg("client disconnected");
 	}
 
 	public void handleRemoteGameControllerInfo(

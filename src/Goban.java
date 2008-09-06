@@ -49,14 +49,14 @@ public class Goban extends Canvas
 	 * Request
 	 */
 	public Command beClientCmd = new Command(
-			"Connect to remote",
+			"Join game",
 			Command.SCREEN, 12
 			);
 
 	/**
 	 * Request hosting a local server command.
 	 */
-	public Command beServerCmd = new Command("Host game", Command.SCREEN, 11);
+	public Command beServerCmd = new Command("Start game", Command.SCREEN, 11);
 
 	/**
 	 * Request that user want to play white stones (possibly: too) command.
@@ -136,7 +136,10 @@ public class Goban extends Canvas
 	 */
 	public Goban() {
 		logView.appendString("Welcome in DPC Goban!");
-		logView.appendString("Connect to or host a game to start.");
+		logView.appendString(
+				"Connect to or host a game to start. "
+				+ "Use help to see list of available shortcuts."
+				);
 		logView.appendString("---");
 
 		addCommand(skipIntroCmd);
@@ -233,9 +236,13 @@ public class Goban extends Canvas
 	 * Print basic user help.
 	 */
 	public void printUIHelp() {
-		logView.appendString("1, 3 - zoom in/out");
-		logView.appendString("7, 9 - toggle side, log bars");
-		logView.appendString("arrows - move; action - place stone");
+		logView.appendString("To start/join a game use menu commands.");
+		logView.appendString("When in active game you can:");
+		logView.appendString(" - move (arrows)");
+		logView.appendString(" - place stone (action button)");
+		logView.appendString(" - toggle log visibility (model dependent)");
+		logView.appendString(" - zoom view in/out (model dependent)");
+		logView.appendString("more help: http://dpc.wikidot.com/lab:dpcgoban");
 	}
 
 	/**
@@ -359,18 +366,18 @@ public class Goban extends Canvas
 				board.moveCrosshair(Board.MOVE_RIGHT);
 				break;
 			case GAME_A:
-				board.zoomView(Board.ZOOM_IN);
-				break;
-			case GAME_B:
 				board.zoomView(Board.ZOOM_OUT);
 				break;
+			case GAME_B:
+				board.zoomView(Board.ZOOM_IN);
+				break;
 			case GAME_C:
-				timerToggled = !timerToggled;
+				chatToggled = !chatToggled;
 				repaintUI();
 				break;
 			case GAME_D:
-				chatToggled = !chatToggled;
-				repaintUI();
+				//timerToggled = !timerToggled;
+				//repaintUI();
 				break;
 			case FIRE:
 				moveReq();
