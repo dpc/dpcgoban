@@ -76,6 +76,29 @@ class Board {
 		}
 	}
 
+	protected Player passSound;
+	public void makePassSound() {
+		try {
+			if (passSound == null) {
+				String file = "pass.wav";
+				InputStream is = this.getClass().getResourceAsStream(file);
+				Player p = Manager.createPlayer(is, "audio/x-wav");
+				p.realize();
+				VolumeControl vc = (VolumeControl) p.getControl("VolumeControl");
+				vc.setLevel(100);
+				passSound = p;
+			}
+
+			if (passSound != null) {
+				passSound.start();
+			}
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+		} catch (OutOfMemoryError e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
 	void moveCrosshair(int dir) {
 		int x = ui.getCrosshairX();
 		int y = ui.getCrosshairY();
@@ -142,7 +165,7 @@ class Board {
 		makeMoveSound();
 	}
 	public void pass() {
-		makeMoveSound();
+		makePassSound();
 	}
 
 	public void redrawBoard() {
