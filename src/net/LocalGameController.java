@@ -1,5 +1,9 @@
 
-
+/**
+ * Local GameController implementation.
+ *
+ * Handles user inputs and drawning.
+ */
 class LocalGameController implements GameController {
 
 	Arbiter arbiter;

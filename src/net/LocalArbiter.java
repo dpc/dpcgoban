@@ -10,6 +10,9 @@ class LocalArbiter
 			   LocalArbiterListener.Parent,
 			   BoardLogic.Parent
 {
+	/**
+	 * Custom exception.
+	 */
 	public class CreationError extends Exception {
 		public CreationError(String s) {
 			super(s);

@@ -9,6 +9,9 @@ import javax.microedition.io.StreamConnectionNotifier;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
+/**
+ * Listener for incoming bluetooth connections.
+ */
 class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 
 	private boolean closed = false;

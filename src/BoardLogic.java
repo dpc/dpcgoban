@@ -16,6 +16,9 @@ class BoardLogic {
 	static final int STATE_KO = Board.STATE_KO;
 	static final int STATE_LAST = Board.STATE_LAST;
 
+	/**
+	 * BoardLogic's callbacks.
+	 */
 	interface Parent {
 		void handleBoardStoneChange (
 				BoardLogic bl, int x, int y, int color, int status
@@ -475,6 +478,9 @@ class BoardLogic {
 		return false;
 	}
 
+	/**
+	 * Set of stonest of same colors connected (being alive) together.
+	 */
 	protected class Group {
 		public int liberties;
 		public int color;

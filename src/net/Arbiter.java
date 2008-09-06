@@ -1,4 +1,10 @@
+/**
+ * Game arbiter (server) interface.
+ */
 interface Arbiter {
+	/**
+	 * Arbiter's callbacks.
+	 */
 	public interface Parent {
 		public void handleArbiterMsg(String s);
 		public void handleArbiterInitFinished();

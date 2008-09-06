@@ -1,3 +1,9 @@
+/**
+ * Game controller interface.
+ *
+ * Game controller is every playing/observing facility connected
+ * to arbiter.
+ */
 interface GameController {
 	public void placeStone(int x, int y, int c, int s);
 	public void move(int x, int y, int c);

@@ -1,3 +1,7 @@
+
+/**
+ * Factory for creating LocalArbiterListeners.
+ */
 class LocalArbiterListenerFactory {
 	public static LocalArbiterListener Create(LocalArbiter parent, int type)
 	throws InvalidArgumentException {

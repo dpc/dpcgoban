@@ -3,7 +3,7 @@ import java.io.InputStream;
 import java.io.IOException;
 
 /**
- * Common code for protocol.
+ * Common code for game net protocol handling.
  */
 abstract class CommonTransportHandler {
 	/**

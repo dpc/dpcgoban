@@ -3,6 +3,9 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.Graphics;
 
+/**
+ * UI element to display game messages and logs.
+ */
 class LogView extends UIElementCommon {
 
 	/**

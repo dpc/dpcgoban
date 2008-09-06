@@ -1,3 +1,6 @@
+/**
+ * Game protocol definitions and constans.
+ */
 class Protocol {
 	// GameController can send:
 	static final String MOVE_REQUEST = "move";

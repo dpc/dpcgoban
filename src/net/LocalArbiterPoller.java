@@ -2,7 +2,7 @@ import java.util.Vector;
 import java.io.IOException;
 
 /**
- * Singleton class for LocalArbiterListener poller.
+ * LocalArbiterListener poller.
  *
  * This class is singleton-thread that will record
  * all the new connection and handle them in loop

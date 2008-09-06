@@ -3,8 +3,8 @@ import java.io.IOException;
 import java.lang.System;
 
 /**
- * Remote controller from the point of view
- * of local arbiter.
+ * Remote GameController from the point of view
+ * of LocalArbiter.
  */
 class RemoteGameController
 	implements GameController,
@@ -13,6 +13,9 @@ class RemoteGameController
 	protected LocalArbiter arbiter;
 	protected RemoteGameControllerTransport transport;
 
+	/**
+	 * RemoteGameController callbacks.
+	 */
 	public interface Parent {
 		public void handleRemoteGameControllerInfo(
 				RemoteGameController rgc,

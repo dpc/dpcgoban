@@ -1,6 +1,9 @@
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 
+/**
+ * UI element to display game stats (scores, times, etc.)
+ */
 class StatView extends UIElementCommon {
 	public StatView(Parent parent) {
 		super(parent);
