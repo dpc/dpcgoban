@@ -5,9 +5,8 @@
 	<property name="wtk.home" value="/opt/wtk" />
 	<property name="wtk.cldc.version" value="1.1" />
 	<property name="wtk.midp.version" value="2.0" />
-	<property name="wtk.mmapi.enabled" value="true" />
+	<!-- <property name="wtk.mmapi.enabled" value="true" /> -->
 	<property name="wtk.bluetooth.enabled" value="true" />
-	<property name="wtk.java3d.enabled" value="true" />
 
 	<taskdef resource="antenna.properties"
 		classpath="antenna-bin-1.1.0-beta.jar" />
@@ -18,7 +17,7 @@
 			jarfile="dpcgoban.jar"
 			name="dpcgoban"
 			vendor="Dawid Ciężarkiewicz"
-			version="0.8.2">
+			version="0.9.0">
 
 			<midlet name="dpcgoban" class="GameMain"/>
 			<attribute name="URL" value="http://dpc.wikidto.com/dpcgoban" />

@@ -14,7 +14,8 @@ import javax.microedition.media.control.*;
  * to control game, networking etc.
  */
 public class Goban extends Canvas
-	implements Runnable, UIElement.Parent, Arbiter.Parent {
+	implements Runnable, UIElement.Parent, Arbiter.Parent,
+		  Board.Parent {
 
 	/**
 	 * Command event when application close was requested.
@@ -22,28 +23,16 @@ public class Goban extends Canvas
 	public Command exitCmd = new Command("Exit", Command.BACK, 99);
 
 	/**
-	 * Stop playing music command.
+	 * Mute toggle
 	 */
-	public Command stopMusicCmd = new Command(
-			"Stop music", Command.SCREEN, 41
+	public Command muteToggleCmd = new Command(
+			"Mute toggle", Command.SCREEN, 41
 			);
 
 	/**
-	 * Start playing music command.
+	 * Command event when skip move.
 	 */
-	public Command startMusicCmd = new Command(
-			"Start music", Command.SCREEN, 41
-			);
-
-	/**
-	 * Command event when skip intro was requested.
-	 */
-	public Command skipIntroCmd = new Command("Skip", Command.BACK, 99);
-
-	/**
-	 * Command event when skip intro was requested.
-	 */
-	public Command passReqCmd = new Command("Pass move", Command.SCREEN, 2);
+	public Command passReqCmd = new Command("Pass", Command.SCREEN, 2);
 
 	/**
 	 * Element of UI for board display.
@@ -113,13 +102,6 @@ public class Goban extends Canvas
 	 */
 	private boolean paused = false;
 
-	/**
-	 * Intro.
-	 *
-	 * Nil if none.
-	 */
-	private Intro demo;
-
 	protected boolean fullSizeLogMode = false;
 
 	/**
@@ -148,19 +130,20 @@ public class Goban extends Canvas
 				"Use menu help option"
 				);
 
-		addCommand(skipIntroCmd);
+		addCommand(exitCmd);
 
-		try {
-			demo = new Cube(this);
-		} catch (Exception e) {
-			/* fails on problems with textures etc. */
-			skipIntro();
-			logView.appendString("Couldn't start intro. Sorry.");
-		}
-		addCommand(stopMusicCmd);
-		startMusic();
+		board = new Board(this, boardView);
 
-		board = new Board(boardView);
+		addCommand(moveReqCmd);
+		addCommand(passReqCmd);
+		addCommand(playWhiteCmd);
+		addCommand(playBlackCmd);
+		addCommand(beServerCmd);
+		addCommand(beClientCmd);
+		addCommand(printHelpCmd);
+		addCommand(muteToggleCmd);
+		repaintUI();
+
 	}
 
 	/**
@@ -263,13 +246,6 @@ public class Goban extends Canvas
 	 */
 	public void paint(Graphics g) {
 		long time = System.currentTimeMillis();
-		if (demo != null) {
-			demo.paint(g, time);
-			if (demo.done()) {
-				skipIntro();
-			}
-			return;
-		}
 
 		statView.paint(g);
 		boardView.paint(g);
@@ -292,70 +268,22 @@ public class Goban extends Canvas
 	}
 
 	/**
-	 * Skip intro mode.
-	 */
-	public void skipIntro() {
-		removeCommand(skipIntroCmd);
-		addCommand(exitCmd);
-		addCommand(moveReqCmd);
-		addCommand(passReqCmd);
-		addCommand(playWhiteCmd);
-		addCommand(playBlackCmd);
-		addCommand(beServerCmd);
-		addCommand(beClientCmd);
-		addCommand(printHelpCmd);
-		demo = null;
-		repaintUI();
-	}
-
-	/**
 	 * Stop game.
 	 */
 	public void stop() {
 		stopped = true;
 	}
 
+	protected boolean mute = false;
 	/**
-	 * Start playing music.
+	 * Mute toggle.
 	 */
-	public void startMusic() {
-		removeCommand(startMusicCmd);
-		addCommand(stopMusicCmd);
-
-		// TODO: below makes OutOfMemoryException
-		try
-		{
-			player = Manager.createPlayer(
-				getClass().getResourceAsStream("/intro.midi"), "audio/midi"
-				);
-			player.realize();
-			VolumeControl vc = (VolumeControl) player.getControl("VolumeControl");
-			vc.setLevel(10);
-			player.start();
-		}
-		catch (Exception e)
-		{
-			System.out.println(e);
-		} catch (OutOfMemoryError e) {
-			System.out.println(e.getMessage());
-		}
-
+	public void muteToggle() {
+		mute = !mute;
 	}
 
-	/**
-	 * Stop playing music.
-	 */
-	public void stopMusic() {
-		removeCommand(stopMusicCmd);
-		addCommand(startMusicCmd);
-		try
-		{
-			player.stop();
-		}
-		catch (Exception e)
-		{
-			System.out.println(e);
-		}
+	public boolean isMuted() {
+		return mute;
 	}
 
 	/**

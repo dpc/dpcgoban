@@ -36,7 +36,14 @@ class Board {
 	protected int states[][];
 	Random random = new Random();
 
-	Board(BoardView ui) {
+	public interface Parent {
+		boolean isMuted();
+	}
+
+	protected Parent parent;
+
+	Board(Parent parent, BoardView ui) {
+		this.parent = parent;
 		moveSounds = new Player[MAX_MOVE_SOUNDS];
 		setUiBoard(ui);
 		clearBoard();
@@ -162,10 +169,14 @@ class Board {
 	}
 
 	public void move(int x, int y, int color) {
-		makeMoveSound();
+		if (!parent.isMuted()) {
+			makeMoveSound();
+		}
 	}
 	public void pass() {
-		makePassSound();
+		if (!parent.isMuted()) {
+			makePassSound();
+		}
 	}
 
 	public void redrawBoard() {

@@ -91,8 +91,6 @@ public class GameMain extends MIDlet implements CommandListener {
 			destroyApp(false);
 			notifyDestroyed();
 			return;
-		} else if (c == goban.skipIntroCmd) {
-			goban.skipIntro();
 		} else if (c == goban.moveReqCmd) {
 			goban.moveReq();
 		} else if (c == goban.passReqCmd) {
@@ -107,10 +105,8 @@ public class GameMain extends MIDlet implements CommandListener {
 			goban.playBlack();
 		} else if (c == goban.printHelpCmd) {
 			goban.printUIHelp();
-		} else if (c == goban.stopMusicCmd) {
-			goban.stopMusic();
-		} else if (c == goban.startMusicCmd) {
-			goban.startMusic();
+		} else if (c == goban.muteToggleCmd) {
+			goban.muteToggle();
 		}
 
 		goban.repaintUI();
