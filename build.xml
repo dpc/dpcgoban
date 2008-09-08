@@ -18,7 +18,7 @@
 			jarfile="dpcgoban.jar"
 			name="dpcgoban"
 			vendor="Dawid Ciężarkiewicz"
-			version="0.7">
+			version="0.8.2">
 
 			<midlet name="dpcgoban" class="GameMain"/>
 			<attribute name="URL" value="http://dpc.wikidto.com/dpcgoban" />

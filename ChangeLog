@@ -6,6 +6,9 @@ Kodowanie pliku: UTF-8
 Całość procesu rozwoju aplikacji można prześledzić tutaj:
 http://github.com/dpc/dpcgoban
 
+Dokumentacja znajduje się w katalogu ./dox/ i została wygenerowana
+przy pomocy programu Doxygen.
+
 24/08/2008: v0.8
 - poprawki
 
