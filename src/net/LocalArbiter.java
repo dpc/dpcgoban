@@ -50,7 +50,7 @@ class LocalArbiter
 
 	public void handleListenerUp() {
 		parent.handleArbiterInitFinished();
-		parent.handleArbiterMsg("server started");
+		parent.handleArbiterMsg("network listener started");
 	}
 
 	public void connected(GameController ngc) {

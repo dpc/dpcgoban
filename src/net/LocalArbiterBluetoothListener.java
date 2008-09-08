@@ -74,13 +74,13 @@ class LocalArbiterBluetoothListener implements Runnable, LocalArbiterListener {
 		try {
 			parent.handleListenerInfo(
 					this,
-					"starting up server socket..."
+					"starting up bluetooth..."
 					);
 			initListener();
-		} catch (IOException e) {
+		} catch (Throwable e) {
 			parent.handleListenerInfo(
 					this,
-					"couldn't start server"
+					"couldn't start bluetooth listener: " + e.getMessage()
 					);
 			return;
 		}
