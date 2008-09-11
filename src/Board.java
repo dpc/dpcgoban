@@ -44,7 +44,6 @@ class Board {
 
 	Board(Parent parent, BoardView ui) {
 		this.parent = parent;
-		moveSounds = new Player[MAX_MOVE_SOUNDS];
 		setUiBoard(ui);
 		clearBoard();
 	}
@@ -57,24 +56,21 @@ class Board {
 		states = new int[boardSize][boardSize];
 	}
 
-	protected static final int MAX_MOVE_SOUNDS = 2;
-	protected Player moveSounds[];
+	protected Player moveSound;
 	public void makeMoveSound() {
 		try {
-			int i = random.nextInt(MAX_MOVE_SOUNDS);
-			
-			if (moveSounds[i] == null) {
-				String file = "move" + String.valueOf(i + 1) + ".wav";
+			if (moveSound == null) {
+				String file = "move.wav";
 				InputStream is = this.getClass().getResourceAsStream(file);
 				Player p = Manager.createPlayer(is, "audio/x-wav");
 				p.realize();
 				VolumeControl vc = (VolumeControl) p.getControl("VolumeControl");
 				vc.setLevel(100);
-				moveSounds[i] = p;
+				moveSound = p;
 			}
 
-			if (moveSounds[i] != null) {
-				moveSounds[i].start();
+			if (moveSound != null) {
+				moveSound.start();
 			}
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
