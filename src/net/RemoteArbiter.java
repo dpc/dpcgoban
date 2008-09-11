@@ -29,7 +29,11 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 		} catch (InvalidArgumentException e) {
 			throw new CreationError(e.getMessage());
 		}
+		// set last pong time to 60 sec. in the future
+		// to allo some initial (connecting) delay
 		touchLastPong();
+		lastPong += 1000 * 60;
+
 		touchLastPing();
 		transport.start();
 	}

@@ -30,7 +30,9 @@ class RemoteGameController
 	public RemoteGameController(Parent parent)
 		throws IOException {
 		this.parent = parent;
+		// set lastPing in the future to allow initial delay
 		touchLastPing();
+		lastPing += 1000 * 60;
 	}
 
 	public void registerChildTransport(
