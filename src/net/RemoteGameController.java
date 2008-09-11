@@ -60,6 +60,13 @@ class RemoteGameController
 				);
 	}
 
+	public void updateCaptures(int b, int w) {
+		transport.sendMsg(
+				Protocol.CAPTURE + " "
+				+ String.valueOf(b) + " "
+				+ String.valueOf(w)
+				);
+	}
 	public void move(int x, int y, int c) {
 		transport.sendMsg(
 				Protocol.MOVE + " "

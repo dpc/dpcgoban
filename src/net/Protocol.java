@@ -17,4 +17,5 @@ class Protocol {
 	// the move was accepted
 	static final String MOVE = "move";
 	static final String PASS = "pass";
+	static final String CAPTURE = "capture";
 }

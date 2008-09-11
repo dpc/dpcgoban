@@ -23,9 +23,18 @@ class LocalGameController implements GameController {
 		this.arbiter = arbiter;
 	}
 
+	public void updateCaptures(int b, int w) {
+		log.appendString(
+				"captures: B: " + String.valueOf(b)
+				+ " W: " + String.valueOf(w)
+				);
+	}
+
 	public void moveRequest() {
 		if (arbiter != null) {
-			arbiter.moveRequest(this, board.getCrosshairX(), board.getCrosshairY());
+			arbiter.moveRequest(
+					this, board.getCrosshairX(), board.getCrosshairY()
+					);
 		}
 	}
 

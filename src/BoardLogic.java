@@ -32,6 +32,10 @@ class BoardLogic {
 		void handleBoardClear(
 				BoardLogic bl
 				);
+		void handleCaptureCounterChange(
+				BoardLogic bl,
+				int b, int c
+				);
 	}
 
 	int koX = -1;
@@ -39,6 +43,9 @@ class BoardLogic {
 	int lastX = -1;
 	int lastY = -1;
 	int lastColor = COLOR_BLACK;
+
+	int whiteCaptured = 0;
+	int blackCaptured = 0;
 
 	private Group groups[][];
 
@@ -230,6 +237,14 @@ class BoardLogic {
 			for (int ny = 0; ny < getSize(); ++ny) {
 				if (groups[nx][ny] == toDel) {
 					groups[nx][ny] = null;
+					switch(c) {
+						case COLOR_WHITE:
+							blackCaptured++;
+							break;
+						case COLOR_BLACK:
+							whiteCaptured++;
+							break;
+					}
 					parent.handleBoardStoneChange(
 							this, nx, ny, COLOR_NONE, getState(nx, ny)
 							);
@@ -249,6 +264,7 @@ class BoardLogic {
 			}
 		}
 		recountMarkedLiberties();
+		parent.handleCaptureCounterChange(this, blackCaptured, whiteCaptured);
 	}
 
 	protected void recountMarkedLiberties() {

@@ -150,6 +150,17 @@ class RemoteArbiter implements Arbiter, RemoteArbiterTransport.Parent {
 		} else if (cmd.equals(Protocol.GAME_INFO)) {
 			gameController.gameInfo(s.rest());
 			return;
+		} else if (cmd.equals(Protocol.CAPTURE)) {
+			String bs = s.next();
+			String ws = s.next();
+			if (bs.equals("") || ws.equals("")) {
+				protocolFailure("no enought arguments for cmd: " + cmd);
+				return;
+			}
+			int b = Integer.parseInt(bs);
+			int w = Integer.parseInt(ws);
+			gameController.updateCaptures(b, w);
+			return;
 		} else if (cmd.equals(Protocol.PASS)) {
 			String cs = s.next();
 			if (cs.equals("")) {

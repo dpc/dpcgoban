@@ -13,6 +13,7 @@ interface GameController {
 	public String name();
 	public boolean isActive();
 	public void shutdown();
+	public void updateCaptures(int b, int w);
 
 	public void connectedTo(LocalArbiter arbiter);
 }

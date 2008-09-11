@@ -267,6 +267,20 @@ class LocalArbiter
 		parent.handleArbiterMsg("arbiter: " + s);
 	}
 
+	public void handleCaptureCounterChange(
+			BoardLogic bl, int b, int w
+			)
+	{
+		for (int i = 0; i < connectedControllers.size(); ++i) {
+			GameController gc = (GameController)(
+					connectedControllers.elementAt(i)
+					);
+			if (gc != null) {
+				gc.updateCaptures(b, w);
+			}
+		}
+	}
+
 	public void handleBoardStoneChange (
 			BoardLogic bl, int x, int y, int color, int state
 			)
