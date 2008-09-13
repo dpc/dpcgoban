@@ -48,14 +48,14 @@ class BoardView extends UIElementCommon {
 	/**
 	 * Board offset on the screen - X;
 	 */
-	int sx;
-	int lastSx;
+	int xViewOffset;
+	int lastXViewOffset;
 
 	/**
 	 * Board offset on the screen - Y;
 	 */
-	int sy;
-	int lastSy;
+	int yViewOffset;
+	int lastYViewOffset;
 
 	/**
 	 * Board background visible.
@@ -85,8 +85,8 @@ class BoardView extends UIElementCommon {
 		setBoardSize(boardSize);
 		setStoneSize(stoneSize);
 
-		lastSx -= getStoneX(cx) - oldcx;
-		lastSy -= getStoneY(cy) - oldcy;
+		lastXViewOffset -= getStoneX(cx) - oldcx;
+		lastYViewOffset -= getStoneY(cy) - oldcy;
 
 		recreateBoardImage();
 		drawEmptyBoard();
@@ -301,7 +301,7 @@ class BoardView extends UIElementCommon {
 	 */
 	void checkBoardOffset() {
 		int marginSensitivity = stoneSize * 2;
-		sx = sy = 0;
+		xViewOffset = yViewOffset = 0;
 		int xDiv = parent.getXDiv();
 		int yDiv = parent.getYDiv();
 
@@ -314,36 +314,36 @@ class BoardView extends UIElementCommon {
 		bgRefreshNeeded |= (lastYDiv != yDiv);
 
 		if (xDiv > boardImage.getWidth()) {
-			sx = (xDiv - boardImage.getWidth()) / 2;
+			xViewOffset = (xDiv - boardImage.getWidth()) / 2;
 			bgRefreshNeeded |= true;
 		} else {
-			sx = lastSx;
+			xViewOffset = lastXViewOffset;
 			int x = getStoneX(cx);
-			if (x + sx <= marginSensitivity) {
+			if (x + xViewOffset <= marginSensitivity) {
 				bgRefreshNeeded |= true;
-				sx = - (x - getStoneX(1));
-			} else if (x + sx >= xDiv - marginSensitivity) {
+				xViewOffset = - (x - getStoneX(1));
+			} else if (x + xViewOffset >= xDiv - marginSensitivity) {
 				bgRefreshNeeded |= true;
-				sx = - (x - (xDiv - getStoneX(1)));
+				xViewOffset = - (x - (xDiv - getStoneX(1)));
 			}
 		}
 
 		if (yDiv > boardImage.getHeight()) {
-			sy = (yDiv - boardImage.getHeight()) / 2;
+			yViewOffset = (yDiv - boardImage.getHeight()) / 2;
 			bgRefreshNeeded |= true;
 		} else {
-			sy = lastSy;
+			yViewOffset = lastYViewOffset;
 			int y = getStoneY(cy);
-			if (y + sy <= marginSensitivity) {
+			if (y + yViewOffset <= marginSensitivity) {
 				bgRefreshNeeded |= true;
-				sy = - (y - getStoneY(1));
-			} else if (y + sy >= yDiv - marginSensitivity) {
+				yViewOffset = - (y - getStoneY(1));
+			} else if (y + yViewOffset >= yDiv - marginSensitivity) {
 				bgRefreshNeeded |= true;
-				sy = - (y - (yDiv - getStoneY(1)));
+				yViewOffset = - (y - (yDiv - getStoneY(1)));
 			}
 		}
-		lastSx = sx;
-		lastSy = sy;
+		lastXViewOffset = xViewOffset;
+		lastYViewOffset = yViewOffset;
 		lastXDiv = xDiv;
 		lastYDiv = yDiv;
 
@@ -363,7 +363,7 @@ class BoardView extends UIElementCommon {
 		}
 
 		if (boardImage != null) {
-			g.drawImage(boardImage, sx, sy, Graphics.TOP|Graphics.LEFT);
+			g.drawImage(boardImage, xViewOffset, yViewOffset, Graphics.TOP|Graphics.LEFT);
 		}
 
 	}
@@ -397,8 +397,8 @@ class BoardView extends UIElementCommon {
 			g.setColor(((c * 256) + c) * 256 + c );
 		}
 
-		int x = getStoneX(cx) + sx;
-		int y = getStoneY(cy) + sy;
+		int x = getStoneX(cx) + xViewOffset;
+		int y = getStoneY(cy) + yViewOffset;
 
 		g.drawLine(x-1, y, x+1, y);
 		g.drawLine(x, y-1, x, y+1);
